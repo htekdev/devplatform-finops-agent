@@ -630,19 +630,19 @@ Engineering teams lack visibility into their CI/CD and platform spending:
 - Each recommendation includes "How to implement" steps
 
 #### 5.3 Implement JSON Export
-- [ ] Create `src/tools/report/json-generator.ts`:
+- [x] Create `src/tools/report/json-generator.ts`:
   - Export full report as JSON
   - Include raw data for programmatic access
   - Include calculated metrics
   - Schema documented in types
 
 **Acceptance Criteria:**
-- JSON validates against TypeScript types
-- JSON includes all data needed to regenerate Markdown
-- JSON is properly formatted (indented)
+- [x] JSON validates against TypeScript types
+- [x] JSON includes all data needed to regenerate Markdown
+- [x] JSON is properly formatted (indented)
 
 #### 5.4 Create Recommendations Engine
-- [ ] Create `src/tools/report/recommendations.ts`:
+- [x] Create `src/tools/report/recommendations.ts`:
   - Generate recommendations based on findings:
     - High Actions usage → Optimize workflows, use caching
     - Inactive licenses → Reclaim licenses
@@ -653,30 +653,30 @@ Engineering teams lack visibility into their CI/CD and platform spending:
   - Categorize: Quick Wins, Medium Effort, Strategic
 
 **Acceptance Criteria:**
-- At least 3 recommendations generated per report
-- Each recommendation has $ impact estimate
-- Recommendations sorted by impact (highest first)
-- No generic recommendations (all based on actual data)
+- [x] At least 3 recommendations generated per report
+- [x] Each recommendation has $ impact estimate
+- [x] Recommendations sorted by impact (highest first)
+- [x] No generic recommendations (all based on actual data)
 
 #### 5.5 Create Report Generator Agent
-- [ ] Create `src/agents/report-generator.ts`:
+- [x] Create `src/agents/report-generator.ts`:
   - Use Copilot SDK `defineTool` for report functions
   - Agent reads from shared state (costs + recommendations)
   - Agent should:
     - Generate executive summary
     - Create full report in requested format
     - Tailor language for target audience
-- [ ] Tools to register:
+- [x] Tools to register:
   - `generate_executive_summary` - Quick overview
   - `generate_markdown_report` - Full Markdown report
   - `generate_json_report` - Machine-readable export
   - `generate_recommendations` - Prioritized action items
 
 **Acceptance Criteria:**
-- Agent produces complete reports
-- Reports are actionable (not just data dumps)
-- Reports can be generated in <10 seconds
-- Reports handle partial data (GitHub-only or ADO-only)
+- [x] Agent produces complete reports
+- [x] Reports are actionable (not just data dumps)
+- [x] Reports can be generated in <10 seconds
+- [x] Reports handle partial data (GitHub-only or ADO-only)
 
 ---
 
