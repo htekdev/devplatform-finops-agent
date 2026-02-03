@@ -343,14 +343,14 @@ Engineering teams lack visibility into their CI/CD and platform spending:
 - Handles orgs with Codespaces disabled gracefully
 
 #### 2.5 Create GitHub Analyzer Agent
-- [ ] Create `src/agents/github-analyzer.ts`:
+- [x] Create `src/agents/github-analyzer.ts`:
   - Use Copilot SDK `defineTool` for each data fetcher
   - Define agent system prompt for GitHub analysis context
   - Agent should analyze data and identify:
     - Unusual spikes in usage
     - Inefficient workflows (high failure rate, long duration)
     - Cost optimization opportunities
-- [ ] Tools to register:
+- [x] Tools to register:
   - `fetch_actions_billing` - Get Actions usage
   - `fetch_lfs_billing` - Get LFS usage
   - `fetch_codespaces_billing` - Get Codespaces usage
@@ -358,10 +358,10 @@ Engineering teams lack visibility into their CI/CD and platform spending:
   - `get_github_usage_summary` - Get all GitHub data at once
 
 **Acceptance Criteria:**
-- Agent can be invoked standalone for GitHub-only analysis
-- Agent populates shared state with all GitHub metrics
-- Agent produces preliminary insights (not just raw data)
-- Agent handles API errors and reports them clearly
+- [x] Agent can be invoked standalone for GitHub-only analysis
+- [x] Agent populates shared state with all GitHub metrics
+- [x] Agent produces preliminary insights (not just raw data)
+- [x] Agent handles API errors and reports them clearly
 
 #### 2.6 Write Unit Tests
 - [ ] Create `tests/github/` with tests for:
