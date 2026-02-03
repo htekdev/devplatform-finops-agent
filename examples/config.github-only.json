@@ -1,0 +1,20 @@
+{
+  "github": {
+    "organizations": ["my-github-org"],
+    "token": "${GITHUB_TOKEN}",
+    "thresholds": {
+      "actionsMinutesWarning": 50000,
+      "actionsMinutesCritical": 80000,
+      "lfsStorageWarningGB": 100,
+      "codespacesHoursWarning": 1000
+    }
+  },
+  "cache": {
+    "enabled": true,
+    "ttl": 7200
+  },
+  "reporting": {
+    "format": "both",
+    "includeRawData": true
+  }
+}

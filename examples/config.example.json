@@ -1,0 +1,38 @@
+{
+  "github": {
+    "organizations": ["your-org"],
+    "token": "${GITHUB_TOKEN}",
+    "thresholds": {
+      "actionsMinutesWarning": 50000,
+      "actionsMinutesCritical": 80000,
+      "lfsStorageWarningGB": 100,
+      "lfsStorageCriticalGB": 200,
+      "codespacesHoursWarning": 1000,
+      "codespacesHoursCritical": 2000
+    }
+  },
+  "azureDevOps": {
+    "organizations": ["your-ado-org"],
+    "pat": "${AZDO_PAT}",
+    "thresholds": {
+      "inactiveUserDays": 90,
+      "poolUtilizationWarning": 30,
+      "pipelineFailureRateWarning": 20,
+      "pipelineFailureRateCritical": 50
+    }
+  },
+  "cache": {
+    "enabled": true,
+    "ttl": 3600,
+    "directory": ".cache"
+  },
+  "reporting": {
+    "format": "markdown",
+    "includeRawData": true,
+    "minRecommendationSavings": 100
+  },
+  "pricing": {
+    "configPath": null,
+    "lastUpdated": "2024-01-15"
+  }
+}

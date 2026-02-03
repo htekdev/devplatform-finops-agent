@@ -1,0 +1,19 @@
+{
+  "azureDevOps": {
+    "organizations": ["my-azdo-org"],
+    "pat": "${AZDO_PAT}",
+    "thresholds": {
+      "inactiveUserDays": 60,
+      "poolUtilizationWarning": 25,
+      "pipelineFailureRateWarning": 15
+    }
+  },
+  "cache": {
+    "enabled": true,
+    "ttl": 3600
+  },
+  "reporting": {
+    "format": "json",
+    "minRecommendationSavings": 50
+  }
+}
