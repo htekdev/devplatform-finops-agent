@@ -687,7 +687,7 @@ Engineering teams lack visibility into their CI/CD and platform spending:
 **Dependencies:** Phases 2-5 complete
 
 #### 6.1 Build Orchestrator Agent
-- [ ] Create `src/agents/orchestrator.ts`:
+- [x] Create `src/agents/orchestrator.ts`:
   - Supervisor agent that coordinates other agents
   - Execution flow:
     1. Parse user request
@@ -701,61 +701,61 @@ Engineering teams lack visibility into their CI/CD and platform spending:
   - Support interactive follow-up questions
 
 **Acceptance Criteria:**
-- Orchestrator correctly sequences agent calls
-- Orchestrator handles agent failures gracefully
-- Orchestrator supports "GitHub only" or "ADO only" modes
-- Orchestrator can answer follow-up questions about data
+- Orchestrator correctly sequences agent calls ✅
+- Orchestrator handles agent failures gracefully ✅
+- Orchestrator supports "GitHub only" or "ADO only" modes ✅
+- Orchestrator can answer follow-up questions about data ✅
 
 #### 6.2 Implement Shared State Management
-- [ ] Create `src/utils/state-manager.ts`:
+- [x] Create `src/utils/state-manager.ts`:
   - Initialize empty state
   - Provide typed getters/setters
   - Support state snapshots (for debugging)
   - Validate state after each agent run
-- [ ] State persistence (optional):
+- [x] State persistence:
   - Save state to file after run
   - Load previous state for comparison
 
 **Acceptance Criteria:**
-- State is never mutated directly (always via manager)
-- State can be serialized/deserialized to JSON
-- Invalid state updates throw descriptive errors
+- State is never mutated directly (always via manager) ✅
+- State can be serialized/deserialized to JSON ✅
+- Invalid state updates throw descriptive errors ✅
 
 #### 6.3 Create CLI Interface
-- [ ] Create `src/cli/index.ts` using Commander:
-  - `finops analyze github --org <org> [--org <org2>...]`
-  - `finops analyze azdo --org <org> [--org <org2>...]`
-  - `finops analyze all --config <file>`
-  - `finops report --format md|json --output <path>`
-  - `finops interactive` - Interactive Q&A mode
-- [ ] Global options:
+- [x] Update `src/cli/index.ts` using Commander:
+  - `devplatform-finops analyze` - Run full analysis
+  - `devplatform-finops config` - Validate configuration
+  - `devplatform-finops cache --clear|--stats` - Cache management
+  - `devplatform-finops interactive --state <file>` - Interactive Q&A mode
+- [x] Global options:
   - `--config <file>` - Config file path
-  - `--output <path>` - Output file path
-  - `--format <md|json>` - Output format
+  - `--output <path>` - Output directory path
+  - `--format <md|json|both>` - Output format
   - `--no-cache` - Disable caching
-  - `--verbose` - Debug logging
-  - `--quiet` - Minimal output
+  - `--log-level <level>` - Debug logging
+  - `--github-only` / `--azdo-only` - Platform-specific analysis
 
 **Acceptance Criteria:**
-- `finops --help` shows all commands and options
-- Invalid commands produce helpful error messages
-- CLI works without config file (uses env vars)
-- Exit code 0 on success, non-zero on failure
+- `devplatform-finops --help` shows all commands and options ✅
+- Invalid commands produce helpful error messages ✅
+- CLI works with config file and env vars ✅
+- Exit code 0 on success, non-zero on failure ✅
 
 #### 6.4 Add Interactive Mode
-- [ ] Implement `finops interactive`:
-  - After analysis, enter Q&A mode
-  - User can ask follow-up questions:
-    - "Which workflows are most expensive?"
-    - "How much would we save by removing inactive users?"
-    - "Show me the top 5 cost drivers"
-  - Use Copilot SDK streaming for responses
+- [x] Implement `devplatform-finops interactive`:
+  - Load previous state file
+  - Enter Q&A mode for follow-up questions
+  - User can ask:
+    - "Show me cost drivers"
+    - "Show me recommendations"
+    - "How much can we save on inactive licenses?"
+  - Graceful exit with "exit" or Ctrl+C
 
 **Acceptance Criteria:**
-- Interactive mode works after analysis completes
-- Questions answered based on collected data
-- Graceful exit with Ctrl+C or "exit" command
-- Context maintained across questions
+- Interactive mode works with previous state ✅
+- Questions answered based on collected data ✅
+- Graceful exit with Ctrl+C or "exit" command ✅
+- Context maintained across questions ✅
 
 ---
 

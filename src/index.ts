@@ -32,6 +32,7 @@ export { loadConfig, loadConfigFromEnvOnly } from './utils/config-loader';
 export { initLogger, getLogger } from './utils/logger';
 export { initCache, getCache, Cache } from './utils/cache';
 export { createEmptyState } from './types/state';
+export { StateManager, createStateManager } from './utils/state-manager';
 
 // Configuration schemas
 export {
