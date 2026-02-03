@@ -503,74 +503,40 @@ Engineering teams lack visibility into their CI/CD and platform spending:
 **Dependencies:** Phase 2 and Phase 3 complete
 
 #### 4.1 Define Pricing Data Structures
-- [ ] Create `src/types/pricing.ts`:
+- [x] Create `src/types/pricing.ts`:
   - `GitHubPricing` - Actions per-minute rates, LFS rates, Codespaces rates
   - `AzureDevOpsPricing` - Parallel job costs, license costs
   - `PricingSource` - Config-based or API-fetched
-- [ ] Create `src/utils/pricing.ts`:
+- [x] Create `src/utils/pricing.ts`:
   - Load pricing from config file (JSON)
   - Fallback to hardcoded defaults with warning
   - Support currency conversion (optional)
-- [ ] Default pricing (as of 2024):
-  ```typescript
-  const GITHUB_PRICING = {
-    actions: {
-      ubuntu: 0.008,      // $/minute
-      windows: 0.016,     // $/minute
-      macos: 0.08,        // $/minute
-    },
-    lfs: {
-      storage: 0.07,      // $/GB/month over 1GB
-      bandwidth: 0.0875,  // $/GB over 1GB
-    },
-    codespaces: {
-      compute: {
-        '2-core': 0.18,   // $/hour
-        '4-core': 0.36,   // $/hour
-        '8-core': 0.72,   // $/hour
-        '16-core': 1.44,  // $/hour
-      },
-      storage: 0.07,      // $/GB/month
-    },
-  };
-  
-  const AZDO_PRICING = {
-    parallelJobs: {
-      hosted: 40,         // $/month per job
-      selfHosted: 15,     // $/month per job
-    },
-    licenses: {
-      basic: 6,           // $/user/month
-      basicTestPlans: 52, // $/user/month
-      stakeholder: 0,     // Free
-    },
-  };
-  ```
+- [x] Default pricing (as of 2024)
 
 **Acceptance Criteria:**
-- Pricing can be overridden via config file
-- Pricing data includes last-updated timestamp
-- Warning shown if using hardcoded defaults >90 days old
+- [x] Pricing can be overridden via config file
+- [x] Pricing data includes last-updated timestamp
+- [x] Warning shown if using hardcoded defaults >90 days old
 
 #### 4.2 Implement Cost Calculation Logic
-- [ ] Create `src/tools/cost/calculator.ts`:
+- [x] Create `src/tools/cost/calculator.ts`:
   - `calculateGitHubCosts(usage: GitHubUsageData): GitHubCosts`
   - `calculateAzdoCosts(usage: AzureDevOpsUsageData): AzdoCosts`
   - `calculateTotalCosts(state: FinOpsState): TotalCosts`
-- [ ] Breakdown costs by:
+- [x] Breakdown costs by:
   - Organization
   - Repository (GitHub) / Project (ADO)
   - Cost category (compute, storage, licenses)
-- [ ] Store results in shared state under `costs`
+- [x] Store results in shared state under `costs`
 
 **Acceptance Criteria:**
-- Costs match billing API data (self-validating)
-- Costs broken down to org/repo/project level
-- Handles partial data (GitHub only or ADO only)
-- Returns $0 for unused features (not errors)
+- [x] Costs match billing API data (self-validating)
+- [x] Costs broken down to org/repo/project level
+- [x] Handles partial data (GitHub only or ADO only)
+- [x] Returns $0 for unused features (not errors)
 
 #### 4.3 Build Self-Hosted vs Hosted Comparison
-- [ ] Create `src/tools/cost/hosted-comparison.ts`:
+- [x] Create `src/tools/cost/hosted-comparison.ts`:
   - Calculate current hosted runner costs
   - Estimate self-hosted equivalent (hardware, maintenance)
   - Calculate break-even point
@@ -578,16 +544,16 @@ Engineering teams lack visibility into their CI/CD and platform spending:
     - Queue time savings
     - Infrastructure management overhead
     - Scaling flexibility
-- [ ] Produce recommendation: "Stay hosted" or "Consider self-hosted"
+- [x] Produce recommendation: "Stay hosted" or "Consider self-hosted"
 
 **Acceptance Criteria:**
-- Comparison includes TCO (Total Cost of Ownership)
-- Includes non-cost factors (maintenance burden)
-- Produces clear recommendation with reasoning
-- Handles orgs already using self-hosted
+- [x] Comparison includes TCO (Total Cost of Ownership)
+- [x] Includes non-cost factors (maintenance burden)
+- [x] Produces clear recommendation with reasoning
+- [x] Handles orgs already using self-hosted
 
 #### 4.4 Create Cost Calculator Agent
-- [ ] Create `src/agents/cost-calculator.ts`:
+- [x] Create `src/agents/cost-calculator.ts`:
   - Use Copilot SDK `defineTool` for cost functions
   - Agent reads from shared state (populated by analyzer agents)
   - Agent should:
@@ -595,7 +561,7 @@ Engineering teams lack visibility into their CI/CD and platform spending:
     - Identify top cost drivers
     - Compare to previous periods (if data available)
     - Suggest cost optimization opportunities
-- [ ] Tools to register:
+- [x] Tools to register:
   - `calculate_github_costs` - GitHub cost breakdown
   - `calculate_azdo_costs` - ADO cost breakdown
   - `compare_hosted_options` - Self-hosted ROI analysis
@@ -603,23 +569,23 @@ Engineering teams lack visibility into their CI/CD and platform spending:
   - `get_cost_summary` - Full cost analysis
 
 **Acceptance Criteria:**
-- Agent produces accurate cost calculations
-- Agent identifies top 3 cost drivers
-- Agent can project costs 1/3/6 months ahead
-- Agent handles missing data gracefully
+- [x] Agent produces accurate cost calculations
+- [x] Agent identifies top 3 cost drivers
+- [x] Agent can project costs 1/3/6 months ahead
+- [x] Agent handles missing data gracefully
 
 #### 4.5 Add Trend Analysis and Projections
-- [ ] Create `src/tools/cost/projections.ts`:
+- [x] Create `src/tools/cost/projections.ts`:
   - Calculate month-over-month growth rate
   - Project costs for next 1, 3, 6 months
   - Identify accelerating cost trends
   - Flag projected threshold breaches
 
 **Acceptance Criteria:**
-- Projections based on actual historical data
-- Projections include confidence range
-- Flags projected costs exceeding thresholds
-- Handles insufficient historical data gracefully
+- [x] Projections based on actual historical data
+- [x] Projections include confidence range
+- [x] Flags projected costs exceeding thresholds
+- [x] Handles insufficient historical data gracefully
 
 ---
 
