@@ -151,8 +151,8 @@ Engineering teams lack visibility into their CI/CD and platform spending:
 **Dependencies:** None (starting point)
 
 #### 1.1 Initialize TypeScript Project
-- [ ] Create `package.json` with project metadata
-- [ ] Install dependencies:
+- [x] Create `package.json` with project metadata
+- [x] Install dependencies:
   - `@github/copilot-sdk` - Agent runtime
   - `@octokit/rest` - GitHub API client
   - `axios` - Azure DevOps API client
@@ -160,17 +160,17 @@ Engineering teams lack visibility into their CI/CD and platform spending:
   - `commander` - CLI framework
   - `chalk` - Terminal styling
   - `dotenv` - Environment config
-- [ ] Configure `tsconfig.json` with strict mode
-- [ ] Set up ESLint and Prettier
-- [ ] Create npm scripts: `build`, `dev`, `test`, `lint`
+- [x] Configure `tsconfig.json` with strict mode
+- [x] Set up ESLint and Prettier
+- [x] Create npm scripts: `build`, `dev`, `test`, `lint`
 
 **Acceptance Criteria:**
-- `npm install` completes without errors
-- `npm run build` compiles TypeScript successfully
-- `npm run lint` passes with no errors
+- [x] `npm install` completes without errors
+- [x] `npm run build` compiles TypeScript successfully
+- [x] `npm run lint` passes with no errors
 
 #### 1.2 Set Up Project Structure
-- [ ] Create directory structure:
+- [x] Create directory structure:
   ```
   src/
   ├── agents/           # Agent definitions
@@ -203,58 +203,58 @@ Engineering teams lack visibility into their CI/CD and platform spending:
   ```
 
 **Acceptance Criteria:**
-- All directories exist with placeholder files
-- Main entry point exports key modules
+- [x] All directories exist with placeholder files
+- [x] Main entry point exports key modules
 
 #### 1.3 Define Shared State Interface
-- [ ] Create `src/types/state.ts` with:
+- [x] Create `src/types/state.ts` with:
   - `FinOpsState` - Root state interface
   - `GitHubUsageData` - GitHub metrics
   - `AzureDevOpsUsageData` - ADO metrics
   - `CalculatedCosts` - Cost calculations
   - `Recommendation` - Individual recommendation
-- [ ] State must support multiple organizations
-- [ ] State must be serializable to JSON (for debugging/caching)
+- [x] State must support multiple organizations
+- [x] State must be serializable to JSON (for debugging/caching)
 
 **Acceptance Criteria:**
-- State interface compiles with no type errors
-- State can represent data from 5+ GitHub orgs and 5+ ADO orgs
-- State includes timestamps for cache invalidation
+- [x] State interface compiles with no type errors
+- [x] State can represent data from 5+ GitHub orgs and 5+ ADO orgs
+- [x] State includes timestamps for cache invalidation
 
 #### 1.4 Create Configuration Schema
-- [ ] Create `src/types/config.ts` with Zod schemas:
+- [x] Create `src/types/config.ts` with Zod schemas:
   - `GitHubConfigSchema` - GitHub org config + thresholds
   - `AzureDevOpsConfigSchema` - ADO org config + thresholds
   - `ReportingConfigSchema` - Output preferences
   - `FinOpsConfigSchema` - Combined root config
-- [ ] Support loading from:
+- [x] Support loading from:
   - JSON file (`--config config.json`)
   - Environment variables (`GITHUB_TOKEN`, `AZDO_PAT`)
   - CLI flags (override config file)
-- [ ] Create `src/utils/config-loader.ts`
+- [x] Create `src/utils/config-loader.ts`
 
 **Acceptance Criteria:**
-- Invalid config throws descriptive Zod errors
-- Environment variables override config file values
-- Sensitive values (tokens) can be provided via env vars only
+- [x] Invalid config throws descriptive Zod errors
+- [x] Environment variables override config file values
+- [x] Sensitive values (tokens) can be provided via env vars only
 
 #### 1.5 Implement API Response Caching
-- [ ] Create `src/utils/cache.ts` with:
+- [x] Create `src/utils/cache.ts` with:
   - File-based cache (JSON in `.cache/` directory)
   - TTL-based expiration (configurable, default 1 hour)
   - Cache key generation from request params
   - `get<T>(key)`, `set<T>(key, value, ttl)`, `invalidate(key)`
-- [ ] Add `--no-cache` CLI flag to bypass cache
-- [ ] Add `--cache-ttl <seconds>` CLI flag
+- [x] Add `--no-cache` CLI flag to bypass cache
+- [x] Add `--cache-ttl <seconds>` CLI flag
 
 **Acceptance Criteria:**
-- Repeated API calls return cached data within TTL
-- Cache files are human-readable JSON
-- `--no-cache` forces fresh API calls
-- Cache directory can be configured
+- [x] Repeated API calls return cached data within TTL
+- [x] Cache files are human-readable JSON
+- [x] `--no-cache` forces fresh API calls
+- [x] Cache directory can be configured
 
 #### 1.6 Set Up Development Environment
-- [ ] Create `.env.example` with all required variables:
+- [x] Create `.env.example` with all required variables:
   ```
   GITHUB_TOKEN=ghp_xxx
   GITHUB_ORGS=org1,org2
@@ -263,15 +263,15 @@ Engineering teams lack visibility into their CI/CD and platform spending:
   LOG_LEVEL=info
   CACHE_TTL=3600
   ```
-- [ ] Create `src/utils/logger.ts` with log levels
-- [ ] Add npm scripts for development:
+- [x] Create `src/utils/logger.ts` with log levels
+- [x] Add npm scripts for development:
   - `dev` - Run with ts-node and watch
   - `debug` - Run with debugger attached
 
 **Acceptance Criteria:**
-- `npm run dev` starts the CLI in watch mode
-- Missing required env vars produce helpful error messages
-- Logger respects LOG_LEVEL setting
+- [x] `npm run dev` starts the CLI in watch mode
+- [x] Missing required env vars produce helpful error messages
+- [x] Logger respects LOG_LEVEL setting
 
 ---
 
