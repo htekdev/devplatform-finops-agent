@@ -384,12 +384,12 @@ Engineering teams lack visibility into their CI/CD and platform spending:
 **Dependencies:** Phase 1 complete (can run parallel with Phase 2)
 
 #### 3.1 Implement Azure DevOps API Client
-- [ ] Create `src/clients/azdo-client.ts`:
+- [x] Create `src/clients/azdo-client.ts`:
   - Initialize axios with PAT auth (Basic auth header)
   - Handle multiple base URLs (dev.azure.com, vssps.dev.azure.com, vsaex.dev.azure.com)
   - Implement continuation token pagination
   - Add request/response logging at debug level
-- [ ] Methods to implement:
+- [x] Methods to implement:
   - `getAgentPools(org: string)`
   - `getAgentsInPool(org: string, poolId: number)`
   - `getPipelineRuns(org: string, project: string, options?)`
@@ -397,79 +397,79 @@ Engineering teams lack visibility into their CI/CD and platform spending:
   - `getProjects(org: string)`
 
 **Acceptance Criteria:**
-- Client correctly uses different base URLs per API
-- Client handles continuation tokens automatically
-- All methods return typed responses
-- Auth errors produce clear "check PAT scopes" message
+- [x] Client correctly uses different base URLs per API
+- [x] Client handles continuation tokens automatically
+- [x] All methods return typed responses
+- [x] Auth errors produce clear "check PAT scopes" message
 
 #### 3.2 Build Parallel Job Usage Fetcher
-- [ ] Create `src/tools/azdo/parallel-jobs.ts`:
+- [x] Create `src/tools/azdo/parallel-jobs.ts`:
   - Fetch all agent pools (hosted and self-hosted)
   - Calculate utilization: (running jobs / pool size)
   - Compare hosted vs self-hosted capacity
   - Identify pools with low utilization (<30%)
   - Identify pools with high queue times
-- [ ] Store results in shared state under `azdo.parallelJobs`
+- [x] Store results in shared state under `azdo.parallelJobs`
 
 **Acceptance Criteria:**
-- Returns pool list with hosted/self-hosted classification
-- Calculates utilization percentage per pool
-- Identifies underutilized pools
-- Handles orgs with only hosted runners gracefully
+- [x] Returns pool list with hosted/self-hosted classification
+- [x] Calculates utilization percentage per pool
+- [x] Identifies underutilized pools
+- [x] Handles orgs with only hosted runners gracefully
 
 #### 3.3 Build Pipeline Run History Fetcher
-- [ ] Create `src/tools/azdo/pipeline-runs.ts`:
+- [x] Create `src/tools/azdo/pipeline-runs.ts`:
   - Fetch pipeline runs (last 30 days)
   - Calculate average duration, queue time, success rate
   - Identify slowest pipelines (top 10 by duration)
   - Identify most failed pipelines (top 10 by failure rate)
   - Calculate total pipeline minutes consumed
-- [ ] Store results in shared state under `azdo.pipelines`
+- [x] Store results in shared state under `azdo.pipelines`
 
 **Acceptance Criteria:**
-- Returns pipeline statistics aggregated by pipeline
-- Includes success rate, avg duration, avg queue time
-- Identifies pipelines with >20% failure rate
-- Handles projects with no pipelines gracefully
+- [x] Returns pipeline statistics aggregated by pipeline
+- [x] Includes success rate, avg duration, avg queue time
+- [x] Identifies pipelines with >20% failure rate
+- [x] Handles projects with no pipelines gracefully
 
 #### 3.4 Build User License Status Fetcher
-- [ ] Create `src/tools/azdo/user-licenses.ts`:
+- [x] Create `src/tools/azdo/user-licenses.ts`:
   - Fetch all user entitlements
   - Categorize by license type (Basic, Stakeholder, etc.)
   - Calculate days since last access
   - Identify inactive users (no access in N days, configurable)
   - Calculate potential savings from license reclamation
-- [ ] Store results in shared state under `azdo.licenses`
+- [x] Store results in shared state under `azdo.licenses`
 
 **Acceptance Criteria:**
-- Returns user count by license type
-- Lists users inactive for >30 days (configurable threshold)
-- Calculates monthly cost of inactive licenses
-- Handles orgs with <10 users gracefully
+- [x] Returns user count by license type
+- [x] Lists users inactive for >30 days (configurable threshold)
+- [x] Calculates monthly cost of inactive licenses
+- [x] Handles orgs with <10 users gracefully
 
 #### 3.5 Build Agent Pool Metrics Fetcher
-- [ ] Create `src/tools/azdo/agent-pools.ts`:
+- [x] Create `src/tools/azdo/agent-pools.ts`:
   - Fetch agent details per pool
   - Calculate online vs offline agents
   - Identify agents that haven't run jobs recently
   - Estimate self-hosted infrastructure utilization
-- [ ] Store results in shared state under `azdo.agents`
+- [x] Store results in shared state under `azdo.agents`
 
 **Acceptance Criteria:**
-- Returns agent list with status (online/offline)
-- Calculates self-hosted agent utilization
-- Identifies agents offline for >7 days
-- Handles pools with no agents gracefully
+- [x] Returns agent list with status (online/offline)
+- [x] Calculates self-hosted agent utilization
+- [x] Identifies agents offline for >7 days
+- [x] Handles pools with no agents gracefully
 
 #### 3.6 Create Azure DevOps Analyzer Agent
-- [ ] Create `src/agents/azdo-analyzer.ts`:
+- [x] Create `src/agents/azdo-analyzer.ts`:
   - Use Copilot SDK `defineTool` for each data fetcher
   - Define agent system prompt for ADO analysis context
   - Agent should analyze data and identify:
     - License waste (inactive users)
     - Hosted vs self-hosted ROI opportunities
     - Pipeline efficiency issues
-- [ ] Tools to register:
+- [x] Tools to register:
   - `fetch_parallel_job_usage` - Get pool utilization
   - `fetch_pipeline_runs` - Get pipeline stats
   - `fetch_user_licenses` - Get license data
@@ -477,10 +477,10 @@ Engineering teams lack visibility into their CI/CD and platform spending:
   - `get_azdo_usage_summary` - Get all ADO data at once
 
 **Acceptance Criteria:**
-- Agent can be invoked standalone for ADO-only analysis
-- Agent populates shared state with all ADO metrics
-- Agent produces preliminary insights
-- Agent handles API errors and reports them clearly
+- [x] Agent can be invoked standalone for ADO-only analysis
+- [x] Agent populates shared state with all ADO metrics
+- [x] Agent produces preliminary insights
+- [x] Agent handles API errors and reports them clearly
 
 #### 3.7 Write Unit Tests
 - [ ] Create `tests/azdo/` with tests for:
