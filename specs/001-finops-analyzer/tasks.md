@@ -108,13 +108,13 @@
 
 ### Implementation for User Story 3
 
-- [ ] T038 [US3] Create Cost Calculator agent for pricing and projections in src/agents/cost-calculator.ts
-- [ ] T039 [US3] Implement cost attribution logic by org unit (repos, projects, teams)
-- [ ] T040 [US3] Implement 30/60/90 day cost projections based on usage trends
-- [ ] T041 [US3] Implement recommendation prioritization by ROI (annual savings / effort)
-- [ ] T042 [US3] Ensure all recommendations include executionParams with method, params, effort, risk
-- [ ] T043 [US3] Mark recommendations as "auto-executable" or "requires-approval" based on risk level
-- [ ] T044 [US3] Validate recommendation schema matches contracts/report-output.schema.json
+- [x] T038 [US3] Create Cost Calculator agent for pricing and projections in src/agents/cost-calculator.ts
+- [x] T039 [US3] Implement cost attribution logic by org unit (repos, projects, teams)
+- [x] T040 [US3] Implement 30/60/90 day cost projections based on usage trends
+- [x] T041 [US3] Implement recommendation prioritization by ROI (annual savings / effort)
+- [x] T042 [US3] Ensure all recommendations include executionParams with method, params, effort, risk
+- [x] T043 [US3] Mark recommendations as "auto-executable" or "requires-approval" based on risk level
+- [x] T044 [US3] Validate recommendation schema matches contracts/report-output.schema.json
 
 **Checkpoint**: All recommendations are now automation-ready with complete execution parameters
 
@@ -128,12 +128,12 @@
 
 ### Implementation for User Story 4
 
-- [ ] T045 [US4] Create Report Generator agent in src/agents/report-generator.ts
-- [ ] T046 [US4] Implement JSON output format with full AnalysisReport structure
-- [ ] T047 [US4] Implement markdown output format with executive summary and tables
-- [ ] T048 [US4] Add `--format json|markdown` CLI option in src/index.ts
-- [ ] T049 [US4] Add `--output <path>` CLI option for file output
-- [ ] T050 [US4] Validate JSON output against contracts/report-output.schema.json
+- [x] T045 [US4] Create Report Generator agent in src/agents/report-generator.ts
+- [x] T046 [US4] Implement JSON output format with full AnalysisReport structure
+- [x] T047 [US4] Implement markdown output format with executive summary and tables
+- [x] T048 [US4] Add `--format json|markdown` CLI option in src/index.ts
+- [x] T049 [US4] Add `--output <path>` CLI option for file output
+- [x] T050 [US4] Validate JSON output against contracts/report-output.schema.json
 
 **Checkpoint**: Machine-readable output available for automation and dashboard integration
 
@@ -147,12 +147,12 @@
 
 ### Implementation for User Story 5
 
-- [ ] T051 [US5] Create Supervisor agent that orchestrates all sub-agents in src/agents/supervisor.ts
-- [ ] T052 [US5] Add `analyze all --github-org <org> --azdo-org <org>` CLI command in src/index.ts
-- [ ] T053 [US5] Implement combined CostBreakdown aggregation across platforms
-- [ ] T054 [US5] Generate executive summary with total monthly spend, top 3 cost drivers, total potential savings
-- [ ] T055 [US5] Implement cross-platform optimization detection (e.g., CI consolidation opportunities)
-- [ ] T056 [US5] Ensure combined report includes separate platform breakdowns and unified totals
+- [x] T051 [US5] Create Supervisor agent that orchestrates all sub-agents in src/agents/supervisor.ts
+- [x] T052 [US5] Add `analyze all --github-org <org> --azdo-org <org>` CLI command in src/index.ts
+- [x] T053 [US5] Implement combined CostBreakdown aggregation across platforms
+- [x] T054 [US5] Generate executive summary with total monthly spend, top 3 cost drivers, total potential savings
+- [x] T055 [US5] Implement cross-platform optimization detection (e.g., CI consolidation opportunities)
+- [x] T056 [US5] Ensure combined report includes separate platform breakdowns and unified totals
 
 **Checkpoint**: Full multi-platform analysis with unified reporting complete
 
@@ -162,16 +162,16 @@
 
 **Purpose**: Improvements that affect multiple user stories
 
-- [ ] T057 [P] Add graceful error handling for invalid/expired API credentials with clear messages
-- [ ] T058 [P] Handle "no usage data" scenario with informative message (not failure)
-- [ ] T059 [P] Implement partial results on API rate limit exhaustion with warning
-- [ ] T060 [P] Add `--days <number>` CLI option for configurable analysis period (default: 30)
-- [ ] T061 [P] Add `--verbose` CLI flag for detailed progress output
-- [ ] T062 Implement fallback pricing with warning when API pricing unavailable
-- [ ] T063 [P] Add configurable inactive user threshold via config (default: 90 days)
-- [ ] T064 [P] Add configurable minimum savings threshold via config (default: $10/month)
-- [ ] T065 Update quickstart.md if CLI interface changed during implementation
-- [ ] T066 Run full validation against quickstart.md scenarios
+- [x] T057 [P] Add graceful error handling for invalid/expired API credentials with clear messages
+- [x] T058 [P] Handle "no usage data" scenario with informative message (not failure)
+- [x] T059 [P] Implement partial results on API rate limit exhaustion with warning
+- [x] T060 [P] Add `--days <number>` CLI option for configurable analysis period (default: 30)
+- [x] T061 [P] Add `--verbose` CLI flag for detailed progress output
+- [x] T062 Implement fallback pricing with warning when API pricing unavailable
+- [x] T063 [P] Add configurable inactive user threshold via config (default: 90 days)
+- [x] T064 [P] Add configurable minimum savings threshold via config (default: $10/month)
+- [x] T065 Update quickstart.md if CLI interface changed during implementation
+- [x] T066 Run full validation against quickstart.md scenarios
 
 ---
 
