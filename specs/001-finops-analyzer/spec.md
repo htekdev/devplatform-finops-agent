@@ -107,6 +107,8 @@ As a platform administrator managing both GitHub and Azure DevOps, I want a unif
 - What happens when API rate limits are hit? → Graceful retry with backoff; partial results returned if limits prevent completion
 - What happens when pricing information is unavailable? → Use last known pricing with a warning; never omit cost estimates entirely
 - What happens when a user has access to only one platform? → Analyze only the available platform without errors
+- What happens when no explicit credentials are provided but platform CLI is authenticated? → System uses CLI credentials automatically
+- What happens when neither explicit credentials nor CLI credentials are available? → Clear error message listing supported authentication methods
 
 ## Requirements *(mandatory)*
 
@@ -143,6 +145,11 @@ As a platform administrator managing both GitHub and Azure DevOps, I want a unif
 - **FR-020**: System MUST accept platform credentials via secure configuration (not command-line arguments)
 - **FR-021**: System MUST allow filtering analysis scope (specific repos, projects, date ranges with default of 90 days)
 - **FR-022**: System MUST allow customization of thresholds (e.g., "inactive" = 90 days by default, configurable)
+
+**Authentication**
+- **FR-023**: System MUST support authentication via existing platform CLI credentials when explicit tokens are not configured
+- **FR-024**: System MUST attempt credential resolution in order: 1) explicit configuration, 2) platform CLI credentials, 3) fail with clear guidance
+- **FR-025**: System MUST validate that credentials have sufficient permissions before proceeding with analysis
 
 ### Non-Functional Requirements
 
