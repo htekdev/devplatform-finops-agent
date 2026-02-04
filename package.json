@@ -1,0 +1,52 @@
+{
+  "name": "devplatform-finops-agent",
+  "version": "0.1.0",
+  "description": "Multi-agent FinOps analyzer for GitHub and Azure DevOps platform costs",
+  "type": "module",
+  "main": "./dist/index.js",
+  "bin": {
+    "finops": "./dist/cli/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "lint": "tsc --noEmit",
+    "typecheck": "tsc --noEmit",
+    "cli": "node --loader ts-node/esm src/cli/index.ts",
+    "analyze": "npm run cli -- analyze",
+    "version": "npm run cli -- version"
+  },
+  "keywords": [
+    "finops",
+    "github",
+    "azure-devops",
+    "cost-analysis",
+    "copilot-agent"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@azure/identity": "^4.0.0",
+    "@github/copilot-sdk": "^0.1.0",
+    "@octokit/plugin-throttling": "^9.0.0",
+    "@octokit/rest": "^21.0.0",
+    "azure-devops-node-api": "^14.0.0",
+    "chalk": "^5.3.0",
+    "commander": "^12.0.0",
+    "octokit-from-auth": "^0.2.0",
+    "p-limit": "^5.0.0",
+    "zod": "^3.23.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@vitest/coverage-v8": "^2.0.0",
+    "typescript": "^5.4.0",
+    "vite-tsconfig-paths": "^4.3.0",
+    "vitest": "^2.0.0"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}
