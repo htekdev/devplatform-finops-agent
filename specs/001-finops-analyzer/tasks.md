@@ -62,16 +62,16 @@
 
 ### Implementation for User Story 1
 
-- [ ] T018 [P] [US1] Implement get_github_actions_billing tool in src/tools/github/actions-billing.ts
-- [ ] T019 [P] [US1] Implement get_lfs_storage tool in src/tools/github/lfs-storage.ts
-- [ ] T020 [P] [US1] Implement get_codespaces_usage tool in src/tools/github/codespaces-usage.ts
-- [ ] T021 [US1] Create GitHub Analyzer agent with tool registration in src/agents/github-analyzer.ts
-- [ ] T022 [US1] Add `analyze github --org <name>` CLI command in src/index.ts
-- [ ] T023 [US1] Implement GitHub cost calculation logic using pricing data in src/agents/github-analyzer.ts
-- [ ] T024 [US1] Generate UsageMetric entries for Actions minutes by OS (UBUNTU, WINDOWS, MACOS)
-- [ ] T025 [US1] Generate UsageMetric entries for LFS storage and bandwidth by repository
-- [ ] T026 [US1] Generate UsageMetric entries for Codespaces hours by user and machine type
-- [ ] T027 [US1] Add recommendation generation for GitHub optimization opportunities
+- [x] T018 [P] [US1] Implement get_github_actions_billing tool in src/tools/github/actions-billing.ts
+- [x] T019 [P] [US1] Implement get_lfs_storage tool in src/tools/github/lfs-storage.ts
+- [x] T020 [P] [US1] Implement get_codespaces_usage tool in src/tools/github/codespaces-usage.ts
+- [x] T021 [US1] Create GitHub Analyzer agent with tool registration in src/agents/github-analyzer.ts
+- [x] T022 [US1] Add `analyze github --org <name>` CLI command in src/index.ts
+- [x] T023 [US1] Implement GitHub cost calculation logic using pricing data in src/agents/github-analyzer.ts
+- [x] T024 [US1] Generate UsageMetric entries for Actions minutes by OS (UBUNTU, WINDOWS, MACOS)
+- [x] T025 [US1] Generate UsageMetric entries for LFS storage and bandwidth by repository
+- [x] T026 [US1] Generate UsageMetric entries for Codespaces hours by user and machine type
+- [x] T027 [US1] Add recommendation generation for GitHub optimization opportunities
 
 **Checkpoint**: User Story 1 should be fully functional - can analyze GitHub org and produce actionable recommendations
 
