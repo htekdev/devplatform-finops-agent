@@ -1,0 +1,280 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "report-output.schema.json",
+  "title": "FinOps Analysis Report Output Schema",
+  "description": "JSON Schema for the machine-readable report output format",
+  
+  "definitions": {
+    "OrgUnit": {
+      "type": "object",
+      "properties": {
+        "organization": { "type": "string" },
+        "project": { "type": ["string", "null"] },
+        "repository": { "type": ["string", "null"] },
+        "team": { "type": ["string", "null"] },
+        "user": { "type": ["string", "null"] }
+      },
+      "required": ["organization"]
+    },
+    
+    "Cost": {
+      "type": "object",
+      "properties": {
+        "amount": { "type": "number", "minimum": 0 },
+        "currency": { "type": "string", "const": "USD" },
+        "isEstimated": { "type": "boolean" }
+      },
+      "required": ["amount", "currency"]
+    },
+    
+    "DateRange": {
+      "type": "object",
+      "properties": {
+        "start": { "type": "string", "format": "date-time" },
+        "end": { "type": "string", "format": "date-time" }
+      },
+      "required": ["start", "end"]
+    },
+    
+    "UsageMetric": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "platform": { "enum": ["github", "azure-devops"] },
+        "resourceType": {
+          "enum": [
+            "actions-minutes", "lfs-storage", "lfs-bandwidth", 
+            "codespaces-hours", "parallel-jobs", "user-license", "agent-pool"
+          ]
+        },
+        "resourceId": { "type": "string" },
+        "resourceName": { "type": "string" },
+        "orgUnit": { "$ref": "#/definitions/OrgUnit" },
+        "quantity": { "type": "number", "minimum": 0 },
+        "unit": { "enum": ["minutes", "hours", "gb", "users", "jobs"] },
+        "period": { "$ref": "#/definitions/DateRange" },
+        "cost": { "$ref": "#/definitions/Cost" },
+        "metadata": { "type": "object" }
+      },
+      "required": ["id", "platform", "resourceType", "resourceId", "resourceName", "orgUnit", "quantity", "unit", "period", "cost"]
+    },
+    
+    "Recommendation": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "title": { "type": "string", "maxLength": 100 },
+        "description": { "type": "string" },
+        "category": { "enum": ["cleanup", "optimization", "migration", "policy-change"] },
+        "actionType": {
+          "enum": [
+            "delete-workflow", "optimize-workflow", "reduce-runners", "downgrade-machine",
+            "remove-user-license", "reduce-parallel-jobs", "switch-to-self-hosted",
+            "consolidate-repos", "archive-repo", "other"
+          ]
+        },
+        "target": {
+          "type": "object",
+          "properties": {
+            "platform": { "enum": ["github", "azure-devops"] },
+            "resourceType": { "type": "string" },
+            "resourceId": { "type": "string" },
+            "resourceName": { "type": "string" },
+            "orgUnit": { "$ref": "#/definitions/OrgUnit" }
+          },
+          "required": ["platform", "resourceType", "resourceId", "resourceName", "orgUnit"]
+        },
+        "executionParams": {
+          "type": "object",
+          "properties": {
+            "method": { "type": "string" },
+            "params": { "type": "object" },
+            "effort": { "enum": ["trivial", "low", "medium", "high"] },
+            "risk": { "enum": ["low", "medium", "high"] }
+          },
+          "required": ["method", "params", "effort", "risk"]
+        },
+        "savings": {
+          "type": "object",
+          "properties": {
+            "monthly": { "type": "number", "minimum": 0 },
+            "annual": { "type": "number", "minimum": 0 },
+            "currency": { "const": "USD" },
+            "confidence": { "enum": ["high", "medium", "low"] }
+          },
+          "required": ["monthly", "annual", "currency", "confidence"]
+        },
+        "priority": { "type": "integer", "minimum": 1 },
+        "approval": {
+          "type": "object",
+          "properties": {
+            "required": { "type": "boolean" },
+            "reason": { "type": "string" },
+            "approvers": { "type": "array", "items": { "type": "string" } }
+          },
+          "required": ["required"]
+        },
+        "sourceMetrics": { "type": "array", "items": { "type": "string" } },
+        "generatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "title", "description", "category", "actionType", "target", "executionParams", "savings", "priority", "approval", "sourceMetrics", "generatedAt"]
+    },
+    
+    "CostBreakdown": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "platform": { "enum": ["github", "azure-devops", "combined"] },
+        "orgUnit": { "$ref": "#/definitions/OrgUnit" },
+        "category": { "enum": ["compute", "storage", "bandwidth", "licensing", "other"] },
+        "period": { "$ref": "#/definitions/DateRange" },
+        "amounts": {
+          "type": "object",
+          "properties": {
+            "actual": { "type": "number", "minimum": 0 },
+            "projected": { "type": "number", "minimum": 0 },
+            "currency": { "const": "USD" }
+          },
+          "required": ["actual", "projected", "currency"]
+        },
+        "trend": {
+          "type": "object",
+          "properties": {
+            "direction": { "enum": ["increasing", "stable", "decreasing"] },
+            "percentChange": { "type": "number" },
+            "projection30Days": { "type": "number", "minimum": 0 },
+            "projection60Days": { "type": "number", "minimum": 0 },
+            "projection90Days": { "type": "number", "minimum": 0 }
+          },
+          "required": ["direction", "percentChange"]
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "label": { "type": "string" },
+              "amount": { "type": "number", "minimum": 0 },
+              "percentage": { "type": "number", "minimum": 0, "maximum": 100 }
+            },
+            "required": ["label", "amount", "percentage"]
+          }
+        }
+      },
+      "required": ["id", "platform", "orgUnit", "category", "period", "amounts", "trend", "details"]
+    },
+    
+    "Diagnostic": {
+      "type": "object",
+      "properties": {
+        "level": { "enum": ["info", "warning", "error"] },
+        "code": { "type": "string" },
+        "message": { "type": "string" },
+        "context": { "type": "object" }
+      },
+      "required": ["level", "code", "message"]
+    }
+  },
+  
+  "type": "object",
+  "properties": {
+    "id": { "type": "string" },
+    "metadata": {
+      "type": "object",
+      "properties": {
+        "generatedAt": { "type": "string", "format": "date-time" },
+        "generatedBy": { "type": "string" },
+        "duration": { "type": "number", "minimum": 0 }
+      },
+      "required": ["generatedAt", "generatedBy", "duration"]
+    },
+    "scope": {
+      "type": "object",
+      "properties": {
+        "platforms": {
+          "type": "array",
+          "items": { "enum": ["github", "azure-devops"] },
+          "minItems": 1
+        },
+        "organizations": {
+          "type": "array",
+          "items": { "type": "string" },
+          "minItems": 1
+        },
+        "dateRange": { "$ref": "#/definitions/DateRange" },
+        "filters": {
+          "type": "object",
+          "properties": {
+            "repositories": { "type": "array", "items": { "type": "string" } },
+            "projects": { "type": "array", "items": { "type": "string" } },
+            "users": { "type": "array", "items": { "type": "string" } }
+          }
+        }
+      },
+      "required": ["platforms", "organizations", "dateRange"]
+    },
+    "summary": {
+      "type": "object",
+      "properties": {
+        "totalMonthlyCost": { "type": "number", "minimum": 0 },
+        "topCostDrivers": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "description": { "type": "string" },
+              "monthlyCost": { "type": "number", "minimum": 0 },
+              "percentage": { "type": "number", "minimum": 0, "maximum": 100 }
+            },
+            "required": ["description", "monthlyCost", "percentage"]
+          },
+          "maxItems": 3
+        },
+        "topRecommendations": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "title": { "type": "string" },
+              "monthlySavings": { "type": "number", "minimum": 0 },
+              "priority": { "type": "integer", "minimum": 1 }
+            },
+            "required": ["title", "monthlySavings", "priority"]
+          },
+          "maxItems": 3
+        },
+        "totalPotentialSavings": {
+          "type": "object",
+          "properties": {
+            "monthly": { "type": "number", "minimum": 0 },
+            "annual": { "type": "number", "minimum": 0 }
+          },
+          "required": ["monthly", "annual"]
+        }
+      },
+      "required": ["totalMonthlyCost", "topCostDrivers", "topRecommendations", "totalPotentialSavings"]
+    },
+    "metrics": {
+      "type": "array",
+      "items": { "$ref": "#/definitions/UsageMetric" }
+    },
+    "costBreakdowns": {
+      "type": "object",
+      "properties": {
+        "byPlatform": { "type": "array", "items": { "$ref": "#/definitions/CostBreakdown" } },
+        "byCategory": { "type": "array", "items": { "$ref": "#/definitions/CostBreakdown" } },
+        "byOrgUnit": { "type": "array", "items": { "$ref": "#/definitions/CostBreakdown" } }
+      },
+      "required": ["byPlatform", "byCategory", "byOrgUnit"]
+    },
+    "recommendations": {
+      "type": "array",
+      "items": { "$ref": "#/definitions/Recommendation" }
+    },
+    "diagnostics": {
+      "type": "array",
+      "items": { "$ref": "#/definitions/Diagnostic" }
+    }
+  },
+  "required": ["id", "metadata", "scope", "summary", "metrics", "costBreakdowns", "recommendations", "diagnostics"]
+}

@@ -1,0 +1,97 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "github-billing.schema.json",
+  "title": "GitHub Billing API Responses",
+  "description": "JSON Schema for GitHub REST API billing endpoint responses",
+  
+  "definitions": {
+    "ActionsBillingResponse": {
+      "type": "object",
+      "description": "Response from GET /orgs/{org}/settings/billing/actions",
+      "properties": {
+        "total_minutes_used": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Total Actions minutes used this billing cycle"
+        },
+        "total_paid_minutes_used": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Total paid minutes (beyond free tier)"
+        },
+        "included_minutes": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Free minutes included in plan"
+        },
+        "minutes_used_breakdown": {
+          "type": "object",
+          "description": "Minutes breakdown by runner OS",
+          "properties": {
+            "UBUNTU": { "type": "integer", "minimum": 0 },
+            "MACOS": { "type": "integer", "minimum": 0 },
+            "WINDOWS": { "type": "integer", "minimum": 0 }
+          },
+          "additionalProperties": { "type": "integer", "minimum": 0 }
+        }
+      },
+      "required": ["total_minutes_used", "included_minutes", "minutes_used_breakdown"]
+    },
+    
+    "SharedStorageBillingResponse": {
+      "type": "object",
+      "description": "Response from GET /orgs/{org}/settings/billing/shared-storage",
+      "properties": {
+        "days_left_in_billing_cycle": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Days remaining in current billing cycle"
+        },
+        "estimated_paid_storage_for_month": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Estimated paid storage in GB"
+        },
+        "estimated_storage_for_month": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Total estimated storage in GB"
+        }
+      },
+      "required": ["days_left_in_billing_cycle", "estimated_storage_for_month"]
+    },
+    
+    "PackagesBillingResponse": {
+      "type": "object",
+      "description": "Response from GET /orgs/{org}/settings/billing/packages",
+      "properties": {
+        "total_gigabytes_bandwidth_used": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Total bandwidth used in GB"
+        },
+        "total_paid_gigabytes_bandwidth_used": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Paid bandwidth in GB"
+        },
+        "included_gigabytes_bandwidth": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Free bandwidth included in plan"
+        }
+      },
+      "required": ["total_gigabytes_bandwidth_used", "included_gigabytes_bandwidth"]
+    },
+    
+    "BillingUsageSummary": {
+      "type": "object",
+      "description": "Response from GET /orgs/{org}/settings/billing/usage-summary",
+      "properties": {
+        "actions": { "$ref": "#/definitions/ActionsBillingResponse" },
+        "packages": { "$ref": "#/definitions/PackagesBillingResponse" },
+        "shared_storage": { "$ref": "#/definitions/SharedStorageBillingResponse" }
+      }
+    }
+  }
+}

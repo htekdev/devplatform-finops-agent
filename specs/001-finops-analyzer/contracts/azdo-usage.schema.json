@@ -1,0 +1,198 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "azdo-usage.schema.json",
+  "title": "Azure DevOps Usage API Responses",
+  "description": "JSON Schema for Azure DevOps REST API responses used for FinOps analysis",
+  
+  "definitions": {
+    "UserEntitlement": {
+      "type": "object",
+      "description": "User entitlement from User Entitlements API",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uuid",
+          "description": "User entitlement ID"
+        },
+        "user": {
+          "type": "object",
+          "properties": {
+            "displayName": { "type": "string" },
+            "mailAddress": { "type": "string", "format": "email" },
+            "principalName": { "type": "string" }
+          },
+          "required": ["displayName"]
+        },
+        "accessLevel": {
+          "type": "object",
+          "properties": {
+            "licenseDisplayName": {
+              "type": "string",
+              "description": "License type display name"
+            },
+            "accountLicenseType": {
+              "type": "string",
+              "enum": ["none", "earlyAdopter", "express", "professional", "advanced", "stakeholder"],
+              "description": "Account license type"
+            },
+            "status": {
+              "type": "string",
+              "enum": ["none", "active", "disabled", "deleted", "pending", "expired", "pendingDisabled"]
+            }
+          },
+          "required": ["accountLicenseType", "status"]
+        },
+        "lastAccessedDate": {
+          "type": "string",
+          "format": "date-time",
+          "description": "When user last accessed the organization"
+        },
+        "dateCreated": {
+          "type": "string",
+          "format": "date-time",
+          "description": "When user was added to organization"
+        }
+      },
+      "required": ["id", "user", "accessLevel"]
+    },
+    
+    "UserEntitlementsResponse": {
+      "type": "object",
+      "description": "Paginated response from User Entitlements API",
+      "properties": {
+        "continuationToken": {
+          "type": ["string", "null"],
+          "description": "Token for pagination"
+        },
+        "items": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/UserEntitlement" }
+        },
+        "totalCount": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "required": ["items"]
+    },
+    
+    "AgentPool": {
+      "type": "object",
+      "description": "Agent pool definition",
+      "properties": {
+        "id": { "type": "integer" },
+        "name": { "type": "string" },
+        "isHosted": {
+          "type": "boolean",
+          "description": "True if Microsoft-hosted pool"
+        },
+        "poolType": {
+          "type": "string",
+          "enum": ["automation", "deployment"]
+        },
+        "size": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Number of agents in pool"
+        }
+      },
+      "required": ["id", "name", "isHosted"]
+    },
+    
+    "Agent": {
+      "type": "object",
+      "description": "Agent within a pool",
+      "properties": {
+        "id": { "type": "integer" },
+        "name": { "type": "string" },
+        "status": {
+          "type": "string",
+          "enum": ["offline", "online"],
+          "description": "Current agent status"
+        },
+        "enabled": { "type": "boolean" },
+        "createdOn": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "assignedRequest": {
+          "type": ["object", "null"],
+          "description": "Currently assigned job, if any"
+        },
+        "lastCompletedRequest": {
+          "type": ["object", "null"],
+          "description": "Last completed job"
+        }
+      },
+      "required": ["id", "name", "status", "enabled"]
+    },
+    
+    "PipelineRun": {
+      "type": "object",
+      "description": "Pipeline run for queue time analysis",
+      "properties": {
+        "id": { "type": "integer" },
+        "name": { "type": "string" },
+        "state": {
+          "type": "string",
+          "enum": ["unknown", "inProgress", "completed", "canceling"]
+        },
+        "result": {
+          "type": ["string", "null"],
+          "enum": ["unknown", "succeeded", "failed", "canceled", null]
+        },
+        "createdDate": {
+          "type": "string",
+          "format": "date-time",
+          "description": "When run was queued"
+        },
+        "startedDate": {
+          "type": ["string", "null"],
+          "format": "date-time",
+          "description": "When run started execution"
+        },
+        "finishedDate": {
+          "type": ["string", "null"],
+          "format": "date-time",
+          "description": "When run completed"
+        },
+        "pool": { "$ref": "#/definitions/AgentPool" }
+      },
+      "required": ["id", "state", "createdDate"]
+    },
+    
+    "ParallelJobUsage": {
+      "type": "object",
+      "description": "Computed parallel job utilization metrics",
+      "properties": {
+        "poolId": { "type": "integer" },
+        "poolName": { "type": "string" },
+        "isHosted": { "type": "boolean" },
+        "period": {
+          "type": "object",
+          "properties": {
+            "start": { "type": "string", "format": "date-time" },
+            "end": { "type": "string", "format": "date-time" }
+          },
+          "required": ["start", "end"]
+        },
+        "metrics": {
+          "type": "object",
+          "properties": {
+            "totalRuns": { "type": "integer", "minimum": 0 },
+            "totalMinutes": { "type": "number", "minimum": 0 },
+            "averageQueueTimeSeconds": { "type": "number", "minimum": 0 },
+            "maxConcurrentJobs": { "type": "integer", "minimum": 0 },
+            "utilizationPercent": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 100
+            }
+          },
+          "required": ["totalRuns", "totalMinutes", "averageQueueTimeSeconds"]
+        }
+      },
+      "required": ["poolId", "poolName", "isHosted", "metrics"]
+    }
+  }
+}
