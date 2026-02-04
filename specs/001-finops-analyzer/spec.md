@@ -14,6 +14,14 @@
 - Q: Concurrent API Queries → A: Sequential with batching - 3-5 concurrent queries max, safer for rate limits
 - Q: Stale Pricing Threshold → A: 30 days - warn if cached pricing data is older than 30 days
 - Q: Approval-Required Actions → A: User/license changes only - protect human assets, automate resource changes
+- Q: Permission Validation Strategy → A: Perform upfront permission validation by making test API calls to verify scopes before starting analysis
+- Q: What happens when cached pricing data becomes stale? → A: 90 days (already documented in spec)
+- Q: How should terminated/deleted resources be handled in recommendations? → A: Exclude entirely from recommendations, only show in raw data
+- Q: Permission Error Handling → A: C - Perform upfront permission validation by making test API calls to verify scopes before starting analysis
+- Q: Partial Platform Failure → A: A - Return partial results with prominent warning about unavailable platform
+- Q: Historical Timeframe → A: B - 90 days (confirms existing spec)
+- Q: Zero-Opportunity Items → A: A - Exclude from recommendations, only show in raw data
+- Q: API Failure/Timeout → A: B - Return partial results with clear warnings about missing data
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -102,13 +110,15 @@ As a platform administrator managing both GitHub and Azure DevOps, I want a unif
 
 ### Edge Cases
 
-- What happens when API credentials are invalid or expired? → Clear error message indicating which platform and what permission is missing
-- What happens when an organization has no usage data? → Report indicates "No usage data found" rather than failing
+- What happens when API credentials are invalid or expired? → Clear error message indicating which platform and what permission is missing (upfront validation via test API calls prevents starting analysis with insufficient permissions)
+- What happens when an organization has no usage data? → Report indicates "No usage data found" rather than failing (zero-opportunity items excluded from recommendations, shown only in raw data)
 - What happens when API rate limits are hit? → Graceful retry with backoff; partial results returned if limits prevent completion
 - What happens when pricing information is unavailable? → Use last known pricing with a warning; never omit cost estimates entirely
 - What happens when a user has access to only one platform? → Analyze only the available platform without errors
 - What happens when no explicit credentials are provided but platform CLI is authenticated? → System uses CLI credentials automatically
 - What happens when neither explicit credentials nor CLI credentials are available? → Clear error message listing supported authentication methods
+- What happens when one platform fails during combined analysis? → Return partial results with prominent warning about unavailable platform (e.g., "GitHub analysis complete, Azure DevOps unavailable: [reason]")
+- What happens when API calls fail or timeout during analysis? → Return partial results with clear warnings about missing data sections (e.g., "LFS data unavailable due to timeout, other metrics included")
 
 ## Requirements *(mandatory)*
 
@@ -135,21 +145,27 @@ As a platform administrator managing both GitHub and Azure DevOps, I want a unif
 - **FR-014**: System MUST include execution parameters for each recommendation sufficient for automation
 - **FR-015**: System MUST mark recommendations as "auto-executable" or "requires-approval" (user/license changes require approval; resource changes are auto-executable)
 - **FR-016**: System MUST prioritize recommendations by ROI (savings vs effort)
+- **FR-017a**: System MUST exclude terminated or deleted resources from recommendations entirely (they may appear in raw historical usage data only)
 
 **Output**
-- **FR-017**: System MUST produce human-readable reports (formatted text)
-- **FR-018**: System MUST produce machine-readable output in JSON format
-- **FR-019**: System MUST include an executive summary with top 3 recommendations and total savings potential
+- **FR-018**: System MUST produce human-readable reports (formatted text)
+- **FR-019**: System MUST produce machine-readable output in JSON format
+- **FR-020**: System MUST include an executive summary with top 3 recommendations and total savings potential
 
 **Configuration**
-- **FR-020**: System MUST accept platform credentials via secure configuration (not command-line arguments)
-- **FR-021**: System MUST allow filtering analysis scope (specific repos, projects, date ranges with default of 90 days)
-- **FR-022**: System MUST allow customization of thresholds (e.g., "inactive" = 90 days by default, configurable)
+- **FR-021**: System MUST accept platform credentials via secure configuration (not command-line arguments)
+- **FR-022**: System MUST allow filtering analysis scope (specific repos, projects, date ranges with default of 90 days)
+- **FR-023**: System MUST allow customization of thresholds (e.g., "inactive" = 90 days by default, configurable)
 
 **Authentication**
-- **FR-023**: System MUST support authentication via existing platform CLI credentials when explicit tokens are not configured
-- **FR-024**: System MUST attempt credential resolution in order: 1) explicit configuration, 2) platform CLI credentials, 3) fail with clear guidance
-- **FR-025**: System MUST validate that credentials have sufficient permissions before proceeding with analysis
+- **FR-024**: System MUST support authentication via existing platform CLI credentials when explicit tokens are not configured
+- **FR-025**: System MUST attempt credential resolution in order: 1) explicit configuration, 2) platform CLI credentials, 3) fail with clear guidance
+- **FR-026**: System MUST validate credentials have sufficient permissions by making test API calls to verify required scopes before starting full analysis (fail fast if permissions insufficient)
+
+**Partial Failure Handling**
+- **FR-027**: When one platform fails during combined analysis, system MUST return partial results with prominent warning identifying the unavailable platform and reason
+- **FR-028**: When API calls fail or timeout for specific data categories, system MUST return partial results with clear warnings about missing data sections (e.g., "LFS data unavailable due to timeout")
+- **FR-029**: System MUST distinguish between complete failure (stop analysis) vs recoverable partial failure (continue with warnings)
 
 ### Non-Functional Requirements
 
@@ -162,13 +178,15 @@ As a platform administrator managing both GitHub and Azure DevOps, I want a unif
 **Data Quality**
 - **NFR-005**: System MUST validate all pricing data freshness and warn if cached data exceeds 30 days
 - **NFR-006**: System MUST handle partial data gracefully, returning available results with clear warnings about missing data
+- **NFR-007**: System MUST return partial results when one platform fails during combined analysis, with prominent warning about unavailable platform
+- **NFR-008**: System MUST return partial results when specific API calls fail or timeout, with clear enumeration of missing data sections
 
 ### Key Entities
 
 - **UsageMetric**: A measurement of resource consumption (type, resource, quantity, time period up to 90 days, cost)
 - **Recommendation**: An actionable suggestion (type, target, action, parameters, savings, priority, approval-required flag where user/license changes=true, resource changes=false)
 - **CostBreakdown**: Attribution of costs to organizational units (platform, org-unit, category, amount, trend over 90 days)
-- **AnalysisReport**: Complete output of an analysis run in JSON format (timestamp, scope, metrics, recommendations, summary)
+- **AnalysisReport**: Complete output of an analysis run in JSON format (timestamp, scope, metrics, recommendations, summary, warnings array for partial failures/missing data sections)
 - **PricingData**: Cached platform pricing information (platform, service, price, last-updated timestamp, stale-warning if >30 days)
 
 ## Success Criteria *(mandatory)*
@@ -184,6 +202,8 @@ As a platform administrator managing both GitHub and Azure DevOps, I want a unif
 - **SC-007**: Users can understand the executive summary without platform-specific knowledge (validated by stakeholder review)
 - **SC-008**: System warns when pricing data is stale (>30 days old) in 100% of cases
 - **SC-009**: 100% of user/license change recommendations are marked as "requires-approval"; 100% of resource-only recommendations are marked as "auto-executable"
+- **SC-010**: When one platform is unavailable during combined analysis, system returns partial results with clear warning (validated by simulating platform failure)
+- **SC-011**: When API timeouts occur, system returns partial results covering available data with explicit enumeration of missing sections (validated by simulating timeout conditions)
 
 ## Assumptions
 
