@@ -1,0 +1,46 @@
+{
+  "name": "finops-agent",
+  "version": "1.0.0",
+  "description": "Multi-agent system for analyzing GitHub and Azure DevOps platform costs",
+  "type": "module",
+  "main": "dist/index.js",
+  "bin": {
+    "finops-agent": "./dist/index.js"
+  },
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "build": "tsc",
+    "test": "vitest",
+    "lint": "eslint src --ext .ts",
+    "format": "prettier --write \"src/**/*.ts\""
+  },
+  "keywords": [
+    "finops",
+    "github",
+    "azure-devops",
+    "cost-analysis",
+    "copilot"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@github/copilot-sdk": "^0.1.21",
+    "@octokit/rest": "^22.0.1",
+    "azure-devops-node-api": "^15.1.2",
+    "chalk": "^5.6.2",
+    "commander": "^14.0.3",
+    "zod": "^4.3.6"
+  },
+  "devDependencies": {
+    "@types/node": "^25.2.0",
+    "@typescript-eslint/eslint-plugin": "^8.54.0",
+    "@typescript-eslint/parser": "^8.54.0",
+    "eslint": "^9.39.2",
+    "eslint-config-prettier": "^10.1.8",
+    "prettier": "^3.8.1",
+    "typescript": "^5.9.3",
+    "vitest": "^4.0.18"
+  }
+}

@@ -23,12 +23,12 @@
 
 **Purpose**: Project initialization and ESM-based TypeScript structure
 
-- [ ] T001 Initialize Node.js project with ESM (`"type": "module"`) in package.json
-- [ ] T002 Configure TypeScript 5.x with strict mode in tsconfig.json
-- [ ] T003 [P] Install core dependencies: @github/copilot-sdk, @octokit/rest, azure-devops-node-api, zod, commander, chalk
-- [ ] T004 [P] Configure Vitest for ESM-compatible testing in vitest.config.ts
-- [ ] T005 [P] Setup linting with ESLint and Prettier in .eslintrc.json and .prettierrc
-- [ ] T006 Create project directory structure per plan.md (src/agents/, src/tools/, src/models/, src/lib/, src/config/)
+- [x] T001 Initialize Node.js project with ESM (`"type": "module"`) in package.json
+- [x] T002 Configure TypeScript 5.x with strict mode in tsconfig.json
+- [x] T003 [P] Install core dependencies: @github/copilot-sdk, @octokit/rest, azure-devops-node-api, zod, commander, chalk
+- [x] T004 [P] Configure Vitest for ESM-compatible testing in vitest.config.ts
+- [x] T005 [P] Setup linting with ESLint and Prettier in .eslintrc.json and .prettierrc
+- [x] T006 Create project directory structure per plan.md (src/agents/, src/tools/, src/models/, src/lib/, src/config/)
 
 ---
 
