@@ -1,0 +1,43 @@
+{
+  "lastUpdated": "2026-02-04",
+  "github": {
+    "actions": {
+      "UBUNTU": 0.008,
+      "WINDOWS": 0.016,
+      "MACOS": 0.08
+    },
+    "lfs": {
+      "storage": 0.0875,
+      "bandwidth": 0.0875
+    },
+    "codespaces": {
+      "2-core": 0.18,
+      "4-core": 0.36,
+      "8-core": 0.72
+    },
+    "freeTiers": {
+      "actionsMinutes": 2000,
+      "actionsMinutesMacOS": 200,
+      "lfsStorage": 1,
+      "lfsBandwidth": 1,
+      "codespaces2Core": 60,
+      "codespaces4Core": 30
+    }
+  },
+  "azureDevOps": {
+    "parallelJobs": {
+      "hosted": 40,
+      "selfHosted": 15
+    },
+    "licenses": {
+      "basic": 6,
+      "basicTestPlans": 52
+    },
+    "freeTiers": {
+      "parallelJobs": 1,
+      "basicUsers": 5
+    }
+  },
+  "currency": "USD",
+  "period": "monthly"
+}
