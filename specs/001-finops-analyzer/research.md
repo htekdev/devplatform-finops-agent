@@ -369,17 +369,287 @@ interface FinOpsConfig {
 
 ---
 
+## 7. HTTP Client for Azure DevOps VSAEX APIs
+
+### Decision
+Use Node.js built-in `fetch` (v18+)
+
+### Rationale
+- **Zero dependencies**: Already available in Node.js 20+
+- **TypeScript native**: Built-in types, no @types package needed
+- **ToolResult pattern alignment**: Forces explicit error checking (`response.ok`) which matches our structured error handling requirement
+- **Azure DevOps compatibility**: Reference implementation already uses `fetch` successfully
+
+**Comparison**:
+
+| Aspect | `fetch` (v18+) | `axios` |
+|--------|----------------|---------|
+| Bundle Size | ✅ 0 bytes (built-in) | ❌ +30KB with dependencies |
+| Error Handling | ⚠️ Only rejects on network errors | ✅ Rejects on any error |
+| Basic Auth | ✅ Native via headers | ✅ Native via headers |
+| TypeScript | ✅ Built-in types | ✅ Via @types/axios |
+
+### Implementation Pattern
+
+```typescript
+async function fetchWithBasicAuth<T>(
+  url: string,
+  pat: string,
+  options: { timeout?: number } = {}
+): Promise<ToolResult<T>> {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), options.timeout || 30000);
+
+  try {
+    const response = await fetch(url, {
+      headers: {
+        'Authorization': `Basic ${Buffer.from(`:${pat}`).toString('base64')}`,
+        'Content-Type': 'application/json',
+        'User-Agent': 'finops-agent/1.0',
+      },
+      signal: controller.signal,
+    });
+
+    if (!response.ok) {
+      return {
+        success: false,
+        error: {
+          code: `HTTP_${response.status}`,
+          message: `Azure DevOps API error: ${response.statusText}`,
+          retryable: response.status === 429 || response.status === 503,
+        },
+      };
+    }
+
+    const data = await response.json() as T;
+    return { success: true, data };
+  } catch (error) {
+    return {
+      success: false,
+      error: {
+        code: (error as any).code === 'ABORT_ERR' ? 'TIMEOUT' : 'NETWORK_ERROR',
+        message: `Failed to fetch: ${(error as Error).message}`,
+        retryable: true,
+      },
+    };
+  } finally {
+    clearTimeout(timeoutId);
+  }
+}
+```
+
+### Alternatives Considered
+- **axios**: Adds dependency; automatic error throwing conflicts with ToolResult pattern
+
+---
+
+## 8. Sequential Batching for API Concurrency
+
+### Decision
+Use `p-limit` library for concurrency control (3-5 concurrent requests max per NFR-001)
+
+### Rationale
+- **Industry standard**: 100M+ downloads/week on npm
+- **Simple API**: `const limit = pLimit(3); await limit(() => fetch(...))`
+- **Per-item error handling**: Works with `Promise.allSettled` for partial failures
+- **Octokit integration**: Doesn't interfere with Octokit's throttling plugin
+- **TypeScript support**: Included types
+
+**Comparison**:
+
+| Pattern | Pros | Cons |
+|---------|------|------|
+| Manual Promise.all() chunks | No dependencies | Verbose, no per-item errors |
+| **p-limit** ✅ | Clean API, error handling | +5KB dependency |
+| RxJS queue | Fine-grained control | Overkill, learning curve |
+
+### Implementation Pattern
+
+```typescript
+import pLimit from 'p-limit';
+
+async function batchApiCalls<TItem, TResult>(
+  items: TItem[],
+  apiCall: (item: TItem) => Promise<TResult>,
+  concurrencyLimit: number = 3
+): Promise<{ results: TResult[]; errors: Array<{ item: TItem; error: Error }> }> {
+  const limit = pLimit(concurrencyLimit);
+  const results: TResult[] = [];
+  const errors: Array<{ item: TItem; error: Error }> = [];
+
+  const promises = items.map((item, index) =>
+    limit(async () => {
+      try {
+        const result = await apiCall(item);
+        results[index] = result;
+        return result;
+      } catch (error) {
+        errors.push({ item, error: error as Error });
+        return null;
+      }
+    })
+  );
+
+  await Promise.allSettled(promises);
+
+  return {
+    results: results.filter(r => r !== null),
+    errors,
+  };
+}
+
+// Usage: Fetch billing for 5 repos with 3 concurrent requests
+const { results, errors } = await batchApiCalls(
+  ['repo1', 'repo2', 'repo3', 'repo4', 'repo5'],
+  (repo) => octokit.billing.getGithubActionsBillingOrg({ org: repo }),
+  3 // Max 3 concurrent (per NFR-001)
+);
+```
+
+**Integration with Rate Limiting**:
+- `p-limit` controls **concurrency** (how many at once)
+- Octokit throttling plugin handles **rate limits** (429 responses)
+- Together: Efficient batching that respects GitHub rate limits
+
+### Alternatives Considered
+- **Manual chunking**: More code, no error handling
+- **Async iterators**: Less intuitive API
+
+---
+
+## 9. Report Output Formats
+
+### Decision
+Dual-format reporter with shared data model (JSON + human-readable text)
+
+### Rationale
+- **FR-017**: Human-readable reports required
+- **FR-018**: Machine-readable JSON required
+- **FR-019**: Executive summary with top 3 recommendations
+- **SC-006**: JSON must validate against schema
+- **Single source of truth**: AnalysisReport entity contains all data, formatters are presentation layer
+
+### JSON Schema Structure
+
+```json
+{
+  "version": "1.0.0",
+  "timestamp": "2025-02-04T10:00:00Z",
+  "scope": {
+    "platforms": ["github", "azdo"],
+    "organizations": ["my-org"],
+    "dateRange": { "start": "...", "end": "..." }
+  },
+  "summary": {
+    "totalCost": 1250.50,
+    "potentialSavings": {
+      "monthly": 450.00,
+      "annual": 5400.00
+    },
+    "topRecommendations": [...]
+  },
+  "metrics": [...],
+  "recommendations": [...],
+  "diagnostics": [
+    {
+      "level": "warning",
+      "code": "PRICING_STALE_45DAYS",
+      "message": "Pricing data is 45 days old..."
+    }
+  ]
+}
+```
+
+### Text Format Template
+
+```
+================================================================================
+  FINOPS ANALYSIS REPORT
+================================================================================
+
+Analysis Date: 2025-02-04T10:00:00Z
+Period: 2024-11-05 to 2025-02-04
+Platforms: GitHub, Azure DevOps
+
+EXECUTIVE SUMMARY
+--------------------------------------------------------------------------------
+Total Monthly Cost: $1,250.50
+Potential Savings: $450.00/month ($5,400.00/year)
+
+Top 3 Recommendations:
+  1. Migrate macOS runners to Linux
+     Impact: $3,600/year
+     ✅ Auto-executable
+  
+  2. Remove 12 inactive user licenses
+     Impact: $864/year
+     ⚠️  Requires approval
+  
+  3. Optimize LFS storage for repo-xyz
+     Impact: $420/year
+     ✅ Auto-executable
+
+DETAILED FINDINGS
+--------------------------------------------------------------------------------
+[Full recommendations with parameters for automation...]
+
+DIAGNOSTICS
+--------------------------------------------------------------------------------
+⚠️ [PRICING_STALE_45DAYS] Pricing data is 45 days old...
+
+================================================================================
+End of Report
+================================================================================
+```
+
+### Report Generator
+
+```typescript
+class ReportGenerator {
+  async generate(
+    report: AnalysisReport,
+    format: 'json' | 'text' | 'both'
+  ): Promise<{ json?: string; text?: string }> {
+    // JSON format with schema validation (SC-006)
+    if (format === 'json' || format === 'both') {
+      const json = JSON.stringify(report, null, 2);
+      const valid = validateReport(JSON.parse(json));
+      if (!valid) {
+        throw new Error('Report failed schema validation');
+      }
+      return { json };
+    }
+    
+    // Text format (SC-007: understandable without platform knowledge)
+    if (format === 'text' || format === 'both') {
+      return { text: formatTextReport(report) };
+    }
+  }
+}
+```
+
+### Alternatives Considered
+- **Markdown format**: More complex to parse, text is sufficient for human readability
+- **Separate data models**: Violates DRY, risks inconsistency between formats
+- **Only JSON**: Doesn't meet FR-017 (human-readable required)
+
+---
+
 ## Summary of Technology Stack
 
-| Component | Technology | Version |
-|-----------|------------|---------|
-| Runtime | Node.js | 18+ |
-| Language | TypeScript | 5.x |
-| Module System | ESM | Required |
-| Agent Orchestration | @github/copilot-sdk | 0.1.x |
-| GitHub API | @octokit/rest | 21.x |
-| Azure DevOps API | azure-devops-node-api | 14.x |
-| Schema Validation | zod | 3.x |
-| CLI Framework | commander | 12.x |
-| Testing | vitest | 2.x |
-| Output Styling | chalk | 5.x |
+| Component | Technology | Version | Decision Rationale |
+|-----------|------------|---------|-------------------|
+| Runtime | Node.js | 20+ | Required for built-in fetch, stable LTS |
+| Language | TypeScript | 5.x | Type safety, Copilot SDK native support |
+| Module System | ESM | Required | Copilot SDK dependency |
+| Agent Orchestration | @github/copilot-sdk | 0.1.x | Production-tested, native tool registration |
+| GitHub API | @octokit/rest + @octokit/plugin-throttling | 21.x + 9.x | Official SDK with automatic rate limiting |
+| Azure DevOps API | azure-devops-node-api | 14.x | Official Microsoft SDK |
+| HTTP Client | Node.js fetch | Built-in | Zero dependencies, ToolResult alignment |
+| Schema Validation | zod | 3.x | Tool parameter validation |
+| Concurrency Control | p-limit | 5.x | Simple API, per-item error handling |
+| CLI Framework | commander | 12.x | Most popular, TypeScript support |
+| Testing | vitest | 2.x | Fast, ESM native, better than Jest |
+| Output Styling | chalk | 5.x | Terminal colors for human-readable reports |
+
+**All "NEEDS CLARIFICATION" items from Technical Context have been resolved through research.**
