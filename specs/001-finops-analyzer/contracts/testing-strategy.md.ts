@@ -259,3 +259,67 @@ const exampleEvalCases: AgentEvalCase[] = [
 
 // Placeholder for type checking
 declare function getGitHubActionsBilling(octokit: any, org: string): Promise<any>;
+
+// ============================================================================
+// ESM TEST CONFIGURATION REQUIREMENTS
+// ============================================================================
+// 
+// ADDED: 2026-02-04 (from SPEC_DRIFT.md SD-001)
+// 
+// ESM TypeScript projects (like this one) require special vitest configuration
+// to resolve `.js` imports to `.ts` source files.
+//
+
+/**
+ * REQUIRED DEPENDENCIES (devDependencies):
+ * 
+ * {
+ *   "devDependencies": {
+ *     "vite-tsconfig-paths": "^4.0.0"
+ *   }
+ * }
+ */
+
+/**
+ * REQUIRED VITEST CONFIG:
+ * 
+ * ```typescript
+ * // vitest.config.ts
+ * import { defineConfig } from "vitest/config";
+ * import tsconfigPaths from "vite-tsconfig-paths";
+ * 
+ * export default defineConfig({
+ *   plugins: [tsconfigPaths()],
+ *   test: {
+ *     globals: true,
+ *     environment: "node",
+ *   },
+ * });
+ * ```
+ */
+
+/**
+ * IMPORT PATH VALIDATION:
+ * 
+ * Before marking tests complete, verify:
+ * 
+ * 1. Relative import paths match actual directory depth
+ *    - Count directories from test file to project root
+ *    - Tests at depth N require N `../` segments to reach root
+ *    - Example: tests/unit/tools/github/file.test.ts = 4 levels
+ *      → import from "../../../../src/..." (NOT "../../../src/...")
+ * 
+ * 2. All imports use `.js` extension (ESM requirement)
+ *    - TypeScript compiles to JS, imports must use .js
+ *    - vite-tsconfig-paths resolves .js → .ts during test
+ */
+
+/**
+ * TEST VERIFICATION CHECKLIST (REQUIRED before PR):
+ * 
+ * - [ ] `npm test` runs successfully (not just `npm run build`)
+ * - [ ] All test files are discovered by test runner
+ * - [ ] Test count > 0 (no "0 tests" output)
+ * - [ ] No "Cannot find module" errors
+ * - [ ] No "ERR_MODULE_NOT_FOUND" errors
+ */
