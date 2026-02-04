@@ -39,7 +39,12 @@ export function formatAsMarkdown(report: AnalysisReport): string {
     lines.push('| # | Action | Monthly Savings | Effort |');
     lines.push('|---|--------|----------------|--------|');
 
-    report.recommendations.slice(0, 10).forEach((rec, index) => {
+    // Use the top recommendations from summary (already limited to 3)
+    const topRecs = report.recommendations
+      .sort((a, b) => a.priority - b.priority)
+      .slice(0, 3);
+
+    topRecs.forEach((rec, index) => {
       lines.push(
         `| ${index + 1} | ${rec.title} | $${rec.savings.monthly.toFixed(2)}/mo | ${rec.executionParams.effort} |`
       );

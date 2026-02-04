@@ -20,6 +20,21 @@ export interface UserLicenseData {
   }>;
 }
 
+/**
+ * Get user license information for an organization.
+ * 
+ * Note: This is a placeholder implementation. The azure-devops-node-api package
+ * does not expose the MemberEntitlementManagement API in the standard WebApi client.
+ * A separate API client or direct REST calls would be needed.
+ * 
+ * Expected implementation: Use the User Entitlements API
+ * (https://learn.microsoft.com/en-us/rest/api/azure/devops/memberentitlementmanagement/)
+ * 
+ * @param _connection - Azure DevOps WebApi connection (unused in placeholder)
+ * @param _org - Organization name (unused in placeholder)
+ * @param _inactiveDaysThreshold - Inactive days threshold (unused in placeholder)
+ * @returns Empty license data
+ */
 export async function getUserLicenses(
   _connection: azdev.WebApi,
   _org: string,

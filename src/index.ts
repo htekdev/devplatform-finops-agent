@@ -187,9 +187,9 @@ analyzeCommand
       const totalCost = result.metrics.reduce((sum, m) => sum + m.cost.amount, 0);
       const totalSavings = result.recommendations.reduce((sum, r) => sum + r.savings.monthly, 0);
 
-      // Calculate cost breakdowns
-      const costCalculator2 = new CostCalculator();
-      const costBreakdowns2 = costCalculator2.calculateCostBreakdowns(result.metrics);
+      // Calculate cost breakdowns for Azure DevOps
+      const azdoCostCalculator = new CostCalculator();
+      const azdoCostBreakdowns = azdoCostCalculator.calculateCostBreakdowns(result.metrics);
 
       const topDrivers = result.metrics
         .sort((a, b) => b.cost.amount - a.cost.amount)
@@ -225,7 +225,7 @@ analyzeCommand
           },
         },
         metrics: result.metrics,
-        costBreakdowns: costBreakdowns2,
+        costBreakdowns: azdoCostBreakdowns,
         recommendations: result.recommendations,
         diagnostics: [],
       });

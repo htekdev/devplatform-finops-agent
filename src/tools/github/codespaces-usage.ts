@@ -17,6 +17,17 @@ export interface CodespacesUsageData {
   }>;
 }
 
+/**
+ * Get Codespaces usage for an organization.
+ * 
+ * Note: This is a placeholder implementation. The GitHub API does not yet have
+ * a public Codespaces billing endpoint. This function will be implemented when
+ * the API becomes available. For now, it returns empty data.
+ * 
+ * @param _octokit - Octokit instance (unused in placeholder)
+ * @param _org - Organization name (unused in placeholder)
+ * @returns Empty usage data
+ */
 export async function getCodespacesUsage(
   _octokit: Octokit,
   _org: string
