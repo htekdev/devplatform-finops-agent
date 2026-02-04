@@ -19,16 +19,16 @@ export function createFinOpsOctokit(options: OctokitFactoryOptions = {}): Octoki
   return new ThrottledOctokit({
     auth,
     throttle: {
-      onRateLimit: onRateLimit || ((retryAfter, options, octokit, retryCount) => {
+      onRateLimit: onRateLimit || ((_retryAfter, options, octokit, retryCount) => {
         octokit.log.warn(
-          `Rate limit hit for ${options.method} ${options.url}, retry ${retryCount + 1}/3 after ${retryAfter}s`
+          `Rate limit hit for ${options.method} ${options.url}, retry ${retryCount + 1}/3`
         );
         if (retryCount < 2) {
           return true;
         }
         return false;
       }),
-      onSecondaryRateLimit: onSecondaryRateLimit || ((retryAfter, options, octokit) => {
+      onSecondaryRateLimit: onSecondaryRateLimit || ((_retryAfter, options, octokit) => {
         octokit.log.warn(
           `Secondary rate limit hit for ${options.method} ${options.url} - not retrying`
         );

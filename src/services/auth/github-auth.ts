@@ -1,4 +1,3 @@
-import { Octokit } from "@octokit/rest";
 import { octokitFromAuth } from "octokit-from-auth";
 
 export class AuthenticationError extends Error {
@@ -22,7 +21,7 @@ export class AuthenticationError extends Error {
   }
 }
 
-export async function getGitHubClient(): Promise<Octokit> {
+export async function getGitHubClient(): Promise<any> {
   try {
     return await octokitFromAuth();
   } catch (error) {
@@ -38,7 +37,7 @@ export async function getGitHubClient(): Promise<Octokit> {
   }
 }
 
-export async function validateGitHubAuth(octokit: Octokit): Promise<string> {
+export async function validateGitHubAuth(octokit: any): Promise<string> {
   const { data } = await octokit.rest.users.getAuthenticated();
   return data.login;
 }

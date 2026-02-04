@@ -1,4 +1,4 @@
-import type { ToolResult, ToolError, ErrorCode, SuggestedAction } from "./types.js";
+import type { ToolResult, ToolError } from "./types.js";
 
 export function toToolError(error: unknown, context: string): ToolError {
   if (error instanceof Error) {
