@@ -8,6 +8,7 @@
 import { Command } from "commander";
 import { loadConfig, validateConfig } from "../lib/config.js";
 import { GitHubAnalyzerAgent } from "../agents/github-analyzer.js";
+import { AzDOAnalyzerAgent } from "../agents/azdo-analyzer.js";
 import chalk from "chalk";
 
 const program = new Command();
@@ -26,6 +27,8 @@ program
   .argument("<platform>", "Platform to analyze: github, azdo, or all")
   .option("-o, --org <org>", "Organization to analyze (overrides config)")
   .option("-d, --days <days>", "Analysis period in days", "30")
+  .option("-p, --projects <projects>", "Comma-separated list of Azure DevOps projects to analyze")
+  .option("--inactive-days <days>", "Days of inactivity to flag users (Azure DevOps)", "90")
   .action(async (platform: string, options) => {
     try {
       const config = await loadConfig();
@@ -60,9 +63,44 @@ program
         
         await agent.stop();
         console.log(chalk.green("\n✅ Analysis complete"));
+        
       } else if (platform === "azdo") {
-        console.error(chalk.yellow("Azure DevOps analysis not yet implemented"));
-        process.exit(1);
+        validateConfig(config, "azdo");
+        
+        if (!config.azureDevOps) {
+          console.error(chalk.red("Azure DevOps configuration is missing"));
+          process.exit(1);
+        }
+
+        const org = options.org || config.azureDevOps.organization;
+        
+        if (!org) {
+          console.error(chalk.red("No Azure DevOps organization specified. Use --org or set AZURE_DEVOPS_ORG"));
+          process.exit(1);
+        }
+
+        const projects = options.projects ? options.projects.split(",").map((p: string) => p.trim()) : undefined;
+
+        console.log(chalk.blue("🔍 Starting Azure DevOps cost analysis..."));
+        console.log(chalk.gray(`Organization: ${org}`));
+        if (projects) {
+          console.log(chalk.gray(`Projects: ${projects.join(", ")}`));
+        }
+        console.log(chalk.gray(`Inactive user threshold: ${options.inactiveDays} days\n`));
+
+        const agent = new AzDOAnalyzerAgent(config.llm?.model);
+        const result = await agent.analyze({
+          pat: config.azureDevOps.pat,
+          organization: org,
+          projects,
+          inactiveDays: parseInt(options.inactiveDays),
+        });
+
+        console.log(result);
+        
+        await agent.stop();
+        console.log(chalk.green("\n✅ Analysis complete"));
+        
       } else if (platform === "all") {
         console.error(chalk.yellow("Combined platform analysis not yet implemented"));
         process.exit(1);
