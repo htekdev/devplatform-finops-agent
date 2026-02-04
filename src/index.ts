@@ -11,6 +11,9 @@ export type { GitHubAnalysisContext } from "./agents/github-analyzer.js";
 export { AzDOAnalyzerAgent } from "./agents/azdo-analyzer.js";
 export type { AzDOAnalysisContext } from "./agents/azdo-analyzer.js";
 
+export { OrchestratorAgent } from "./agents/orchestrator.js";
+export type { OrchestratorContext, PlatformResults } from "./agents/orchestrator.js";
+
 // Configuration
 export { loadConfig, validateConfig } from "./lib/config.js";
 export type { FinOpsConfig } from "./lib/config.js";

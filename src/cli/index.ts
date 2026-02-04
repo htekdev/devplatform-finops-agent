@@ -9,6 +9,7 @@ import { Command } from "commander";
 import { loadConfig, validateConfig } from "../lib/config.js";
 import { GitHubAnalyzerAgent } from "../agents/github-analyzer.js";
 import { AzDOAnalyzerAgent } from "../agents/azdo-analyzer.js";
+import { OrchestratorAgent } from "../agents/orchestrator.js";
 import chalk from "chalk";
 
 const program = new Command();
@@ -102,8 +103,31 @@ program
         console.log(chalk.green("\n✅ Analysis complete"));
         
       } else if (platform === "all") {
-        console.error(chalk.yellow("Combined platform analysis not yet implemented"));
-        process.exit(1);
+        // Validate at least one platform is configured
+        if (!config.github?.token && !config.azureDevOps?.pat) {
+          console.error(chalk.red("No platforms configured. Set GITHUB_TOKEN and/or AZURE_DEVOPS_PAT"));
+          process.exit(1);
+        }
+
+        console.log(chalk.blue("🔍 Starting combined platform cost analysis...\n"));
+        
+        if (config.github?.token) {
+          console.log(chalk.gray(`GitHub orgs: ${config.github.organizations.join(", ")}`));
+        }
+        if (config.azureDevOps?.pat) {
+          console.log(chalk.gray(`Azure DevOps org: ${config.azureDevOps.organization}`));
+        }
+        console.log(chalk.gray(`Analysis period: ${options.days} days\n`));
+
+        const orchestrator = new OrchestratorAgent(config.llm?.model);
+        const result = await orchestrator.analyze({
+          config,
+          days: parseInt(options.days),
+        });
+
+        console.log(result);
+        console.log(chalk.green("\n✅ Combined analysis complete"));
+        
       } else {
         console.error(chalk.red(`Unknown platform: ${platform}`));
         console.error(chalk.gray("Valid platforms: github, azdo, all"));
