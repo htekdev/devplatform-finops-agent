@@ -350,6 +350,8 @@ interface AnalysisReport {
 ### JSON Output
 Full structured data as defined above, suitable for automation and dashboards.
 
+**Schema Reference**: `contracts/report-output.schema.json`
+
 ### Markdown Output
 Human-readable report with:
 1. Executive Summary section
@@ -379,3 +381,138 @@ Example:
 | 2 | Switch macOS jobs to Linux | $1,890/mo | Medium |
 | 3 | Archive 3 unused repositories | $52/mo | Low |
 ```
+
+---
+
+## 5. PricingData
+
+Represents pricing configuration with staleness tracking.
+
+```typescript
+interface PricingData {
+  /** Unique identifier */
+  id: string;
+  
+  /** Version of pricing data */
+  version: string;
+  
+  /** When this pricing was last updated */
+  lastUpdated: Date;
+  
+  /** Source of pricing data */
+  source: "default" | "custom" | "api";
+  
+  /** GitHub pricing rates */
+  github: {
+    actions: {
+      UBUNTU: number;    // per minute
+      WINDOWS: number;   // per minute
+      MACOS: number;     // per minute
+    };
+    lfs: {
+      storage: number;   // per GB/month
+      bandwidth: number; // per GB
+    };
+    codespaces: {
+      "2-core": number;  // per hour
+      "4-core": number;  // per hour
+      "8-core": number;  // per hour
+    };
+  };
+  
+  /** Azure DevOps pricing rates */
+  azureDevOps: {
+    parallelJobs: {
+      hosted: number;      // per job/month
+      selfHosted: number;  // per job/month
+    };
+    licenses: {
+      basic: number;           // per user/month
+      basicTestPlans: number;  // per user/month
+    };
+  };
+}
+```
+
+**Staleness Rules**:
+- Warning if `lastUpdated` > 30 days ago
+- Error if `lastUpdated` > 90 days ago
+- `source: "default"` should trigger recommendation to configure custom pricing
+
+---
+
+## JSON Schema References
+
+All entities are validated against JSON schemas in the `contracts/` directory:
+
+| Entity | Schema File | Purpose |
+|--------|-------------|---------|
+| UsageMetric | `contracts/usage-metric.schema.json` | API response validation |
+| Recommendation | `contracts/recommendation.schema.json` | Output validation |
+| CostBreakdown | `contracts/cost-breakdown.schema.json` | Aggregation validation |
+| AnalysisReport | `contracts/report-output.schema.json` | Complete report validation |
+| PricingData | `contracts/pricing-data.schema.json` | Configuration validation |
+| GitHub Billing | `contracts/github-billing.schema.json` | GitHub API responses |
+| Azure DevOps Usage | `contracts/azdo-usage.schema.json` | ADO API responses |
+
+---
+
+## Recommendation Categories (GAP #2)
+
+| Category | Definition | Example Actions |
+|----------|------------|-----------------|
+| **cleanup** | Remove unused/abandoned resources | Delete inactive users, archive repos, remove stale workflows |
+| **optimization** | Improve efficiency of existing resources | Switch runner types, reduce concurrency, consolidate jobs |
+| **migration** | Move to different service/tier | Self-hosted agents, different license tier, platform switch |
+| **policy-change** | Organizational policy updates | Enforce branch policies, require approvals, set quotas |
+
+---
+
+## Effort Units (GAP #3)
+
+| Effort | Time Estimate | Risk Profile | Examples |
+|--------|---------------|--------------|----------|
+| **trivial** | < 1 hour | Very Low | Remove single user, toggle setting |
+| **low** | 1-4 hours | Low | Update workflow files, reconfigure pool |
+| **medium** | 4-16 hours | Medium | Migrate runners, restructure permissions |
+| **high** | > 16 hours | High | Major infrastructure changes, policy rollout |
+
+---
+
+## Filter Syntax (GAP #4)
+
+Analysis scope can be filtered via configuration-based JSON:
+
+```json
+{
+  "scope": {
+    "platforms": ["github", "azure-devops"],
+    "organizations": ["my-org"],
+    "dateRange": {
+      "start": "2024-11-05",
+      "end": "2025-02-04"
+    },
+    "filters": {
+      "repositories": {
+        "include": ["frontend-*", "backend-*"],
+        "exclude": ["*-deprecated"]
+      },
+      "projects": {
+        "include": ["ProjectA", "ProjectB"]
+      },
+      "users": {
+        "exclude": ["service-account-*", "bot-*"]
+      },
+      "resourceTypes": {
+        "include": ["actions-minutes", "user-license"]
+      }
+    }
+  }
+}
+```
+
+**Filter Rules**:
+- Glob patterns supported (`*` wildcard)
+- `exclude` takes precedence over `include`
+- Empty `include` means "include all"
+- Empty `exclude` means "exclude none"

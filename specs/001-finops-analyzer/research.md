@@ -653,3 +653,216 @@ class ReportGenerator {
 | Output Styling | chalk | 5.x | Terminal colors for human-readable reports |
 
 **All "NEEDS CLARIFICATION" items from Technical Context have been resolved through research.**
+
+---
+
+## 10. Authentication Patterns
+
+### Decision
+Use SDK-native credential discovery with CLI fallback (no shell execution).
+
+### Rationale
+- **FR-026**: Must validate credentials upfront via test API calls
+- **Security**: No `execSync` or shell calls for credential discovery
+- **Simplicity**: Leverage existing CLI auth where possible
+
+### GitHub Authentication
+```typescript
+// Option 1: Explicit token (recommended for CI/CD)
+const octokit = new Octokit({ auth: process.env.GITHUB_TOKEN });
+
+// Option 2: GitHub CLI credential discovery
+import { createOctokit } from 'octokit-from-auth';
+const octokit = await createOctokit();
+
+// Credential validation (fail fast)
+async function validateGitHubCredentials(octokit: Octokit): Promise<void> {
+  try {
+    await octokit.users.getAuthenticated();
+  } catch (error) {
+    throw new Error('GitHub authentication failed. Check GITHUB_TOKEN.');
+  }
+}
+```
+
+### Azure DevOps Authentication
+```typescript
+import { DefaultAzureCredential } from '@azure/identity';
+import * as azdev from 'azure-devops-node-api';
+
+// Option 1: Explicit PAT (recommended for CI/CD)
+const authHandler = azdev.getPersonalAccessTokenHandler(process.env.AZURE_DEVOPS_PAT);
+
+// Option 2: Azure CLI credential discovery
+const credential = new DefaultAzureCredential();
+const token = await credential.getToken('499b84ac-1321-427f-aa17-267ca6975798/.default');
+
+// Credential validation (fail fast)
+async function validateAzDoCredentials(connection: azdev.WebApi): Promise<void> {
+  try {
+    await connection.getCoreApi();
+  } catch (error) {
+    throw new Error('Azure DevOps authentication failed. Check credentials.');
+  }
+}
+```
+
+---
+
+## 11. Recommendation Patterns
+
+### Categories
+
+| Category | Definition | Examples |
+|----------|------------|----------|
+| **cleanup** | Remove unused/abandoned resources | Delete inactive users, archive repos |
+| **optimization** | Improve efficiency of existing resources | Switch runner types, reduce parallelism |
+| **migration** | Move to different service/tier | Self-hosted agents, different license tier |
+| **policy-change** | Organizational policy updates | Enforce branch policies, require approvals |
+
+### Effort Units
+
+| Effort | Time Estimate | Examples |
+|--------|---------------|----------|
+| **trivial** | < 1 hour | Remove single user, archive one repo |
+| **low** | 1-4 hours | Update workflow files, reconfigure pool |
+| **medium** | 4-16 hours | Migrate runners, restructure permissions |
+| **high** | > 16 hours | Major infrastructure changes, policy rollout |
+
+### Priority Calculation
+```typescript
+function calculatePriority(rec: Recommendation): number {
+  const roi = rec.savings.annual / getEffortHours(rec.executionParams.effort);
+  const riskPenalty = { low: 1, medium: 0.8, high: 0.5 }[rec.executionParams.risk];
+  return roi * riskPenalty;
+}
+
+function getEffortHours(effort: string): number {
+  return { trivial: 0.5, low: 2, medium: 8, high: 24 }[effort];
+}
+```
+
+---
+
+## 12. Error Handling & Resilience
+
+### ToolResult Pattern
+All tool handlers return structured results:
+```typescript
+type ToolResult<T> = 
+  | { success: true; data: T }
+  | { success: false; error: ToolError };
+
+interface ToolError {
+  code: string;           // Machine-readable error code
+  message: string;        // Human-readable description
+  retryable: boolean;     // Whether retry might succeed
+  context?: Record<string, unknown>;
+}
+```
+
+### Error Codes
+| Code | Description | Retryable |
+|------|-------------|-----------|
+| `AUTH_FAILED` | Invalid credentials | No |
+| `RATE_LIMITED` | API rate limit exceeded | Yes (with backoff) |
+| `NOT_FOUND` | Resource doesn't exist | No |
+| `PERMISSION_DENIED` | Insufficient permissions | No |
+| `NETWORK_ERROR` | Connection failed | Yes |
+| `TIMEOUT` | Request timed out | Yes |
+| `PARTIAL_FAILURE` | Some items failed | Partial |
+
+### Partial Failure Handling (FR-027 to FR-029)
+```typescript
+interface PartialResult<T> {
+  success: true;
+  data: T[];
+  warnings: Array<{
+    code: string;
+    message: string;
+    affectedItems: string[];
+  }>;
+}
+```
+
+---
+
+## 13. Testing Approach
+
+### Test Categories
+
+| Category | Purpose | Tools |
+|----------|---------|-------|
+| **Unit** | Test individual functions | Vitest + mocks |
+| **Integration** | Test agent orchestration | Vitest + fixtures |
+| **Contract** | Validate JSON schemas | ajv + schema files |
+| **Snapshot** | Verify report output | Vitest snapshots |
+
+### Mock Strategy
+```typescript
+// Mock GitHub API responses
+import { vi } from 'vitest';
+
+const mockOctokit = {
+  billing: {
+    getGithubActionsBillingOrg: vi.fn().mockResolvedValue({
+      data: {
+        total_minutes_used: 305,
+        total_paid_minutes_used: 0,
+        included_minutes: 3000,
+        minutes_used_breakdown: { UBUNTU: 205, MACOS: 10, WINDOWS: 90 }
+      }
+    })
+  }
+};
+```
+
+### Test File Naming
+- Source: `src/tools/github/get-actions-billing.ts`
+- Test: `tests/unit/tools/github/get-actions-billing.test.ts`
+
+---
+
+## 14. Filter Syntax (Configuration-Based)
+
+### Filter Configuration Format
+```json
+{
+  "filters": {
+    "repositories": {
+      "include": ["frontend-*", "backend-*"],
+      "exclude": ["*-deprecated", "archive-*"]
+    },
+    "projects": {
+      "include": ["ProjectA", "ProjectB"],
+      "exclude": []
+    },
+    "users": {
+      "exclude": ["service-account-*", "bot-*"]
+    },
+    "resourceTypes": {
+      "include": ["actions-minutes", "user-license"],
+      "exclude": ["codespaces-hours"]
+    }
+  }
+}
+```
+
+### Filter Evaluation
+```typescript
+function matchesFilter(
+  value: string, 
+  filter: { include?: string[]; exclude?: string[] }
+): boolean {
+  // Exclude takes precedence
+  if (filter.exclude?.some(pattern => globMatch(value, pattern))) {
+    return false;
+  }
+  // If include is specified, value must match
+  if (filter.include && filter.include.length > 0) {
+    return filter.include.some(pattern => globMatch(value, pattern));
+  }
+  // No include filter means include all
+  return true;
+}
+```
