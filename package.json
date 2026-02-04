@@ -14,7 +14,7 @@
     "test:coverage": "vitest run --coverage",
     "lint": "tsc --noEmit",
     "typecheck": "tsc --noEmit",
-    "cli": "node --loader ts-node/esm src/cli/index.ts",
+    "cli": "node dist/cli/index.js",
     "analyze": "npm run cli -- analyze",
     "version": "npm run cli -- version"
   },
