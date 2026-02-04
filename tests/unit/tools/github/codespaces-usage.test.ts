@@ -3,7 +3,7 @@
  */
 
 import { describe, it, expect, beforeEach } from "vitest";
-import { getCodespacesUsage } from "../../../dist/tools/github/codespaces-usage.js";
+import { getCodespacesUsage } from "../../../src/tools/github/codespaces-usage.js";
 import type { Octokit } from "@octokit/rest";
 
 describe("getCodespacesUsage", () => {

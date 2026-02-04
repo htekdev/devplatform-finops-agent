@@ -18,7 +18,11 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      "^/src/(.*)$": path.resolve(__dirname, "./dist/$1"),
+      "@/": path.resolve(__dirname, "./src/"),
     },
+    extensions: [".ts", ".js", ".mts", ".mjs"],
+  },
+  esbuild: {
+    target: "es2022",
   },
 });

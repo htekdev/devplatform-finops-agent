@@ -3,7 +3,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { getLFSStorage } from "../../../dist/tools/github/lfs-storage.js";
+import { getLFSStorage } from "../../../src/tools/github/lfs-storage.js";
 import type { Octokit } from "@octokit/rest";
 
 describe("getLFSStorage", () => {

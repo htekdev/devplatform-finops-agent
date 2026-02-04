@@ -3,7 +3,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { getGitHubActionsBilling } from "../../../dist/tools/github/actions-billing.js";
+import { getGitHubActionsBilling } from "../../../src/tools/github/actions-billing.js";
 import type { Octokit } from "@octokit/rest";
 
 describe("getGitHubActionsBilling", () => {
