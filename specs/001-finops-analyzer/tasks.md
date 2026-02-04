@@ -38,17 +38,17 @@
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete
 
-- [ ] T007 Create configuration loader and validator in src/config/index.ts (env vars + ~/.finops-agent/config.json)
-- [ ] T008 [P] Create CopilotClient wrapper and lifecycle management in src/client.ts
-- [ ] T009 [P] Implement rate limiter utility with exponential backoff in src/lib/rate-limiter.ts
-- [ ] T010 [P] Implement retry utility with configurable attempts in src/lib/retry.ts
-- [ ] T011 Create UsageMetric model with Zod validation in src/models/usage-metric.ts
-- [ ] T012 [P] Create Recommendation model with Zod validation in src/models/recommendation.ts
-- [ ] T013 [P] Create CostBreakdown model with Zod validation in src/models/cost-breakdown.ts
-- [ ] T014 Create AnalysisReport model with Zod validation in src/models/analysis-report.ts
-- [ ] T015 [P] Create default pricing constants in src/tools/shared/pricing.ts
-- [ ] T016 [P] Create report formatting utilities (markdown/JSON) in src/tools/shared/report.ts
-- [ ] T017 Create CLI entry point with commander structure in src/index.ts
+- [x] T007 Create configuration loader and validator in src/config/index.ts (env vars + ~/.finops-agent/config.json)
+- [x] T008 [P] Create CopilotClient wrapper and lifecycle management in src/client.ts
+- [x] T009 [P] Implement rate limiter utility with exponential backoff in src/lib/rate-limiter.ts
+- [x] T010 [P] Implement retry utility with configurable attempts in src/lib/retry.ts
+- [x] T011 Create UsageMetric model with Zod validation in src/models/usage-metric.ts
+- [x] T012 [P] Create Recommendation model with Zod validation in src/models/recommendation.ts
+- [x] T013 [P] Create CostBreakdown model with Zod validation in src/models/cost-breakdown.ts
+- [x] T014 Create AnalysisReport model with Zod validation in src/models/analysis-report.ts
+- [x] T015 [P] Create default pricing constants in src/tools/shared/pricing.ts
+- [x] T016 [P] Create report formatting utilities (markdown/JSON) in src/tools/shared/report.ts
+- [x] T017 Create CLI entry point with commander structure in src/index.ts
 
 **Checkpoint**: Foundation ready - user story implementation can now begin in parallel
 
