@@ -85,16 +85,16 @@
 
 ### Implementation for User Story 2
 
-- [ ] T028 [P] [US2] Implement get_parallel_jobs tool in src/tools/azdo/parallel-jobs.ts
-- [ ] T029 [P] [US2] Implement get_user_licenses tool in src/tools/azdo/user-licenses.ts
-- [ ] T030 [P] [US2] Implement get_agent_pools tool in src/tools/azdo/agent-pools.ts
-- [ ] T031 [US2] Create Azure DevOps Analyzer agent with tool registration in src/agents/azdo-analyzer.ts
-- [ ] T032 [US2] Add `analyze azdo --org <name>` CLI command in src/index.ts
-- [ ] T033 [US2] Implement parallel job utilization calculation (hosted vs self-hosted)
-- [ ] T034 [US2] Implement inactive user detection (90+ days threshold, configurable)
-- [ ] T035 [US2] Implement queue time trend analysis from pipeline run history
-- [ ] T036 [US2] Implement agent pool utilization metrics and self-hosted ROI calculation
-- [ ] T037 [US2] Add recommendation generation for ADO optimization opportunities
+- [x] T028 [P] [US2] Implement get_parallel_jobs tool in src/tools/azdo/parallel-jobs.ts
+- [x] T029 [P] [US2] Implement get_user_licenses tool in src/tools/azdo/user-licenses.ts
+- [x] T030 [P] [US2] Implement get_agent_pools tool in src/tools/azdo/agent-pools.ts
+- [x] T031 [US2] Create Azure DevOps Analyzer agent with tool registration in src/agents/azdo-analyzer.ts
+- [x] T032 [US2] Add `analyze azdo --org <name>` CLI command in src/index.ts
+- [x] T033 [US2] Implement parallel job utilization calculation (hosted vs self-hosted)
+- [x] T034 [US2] Implement inactive user detection (90+ days threshold, configurable)
+- [x] T035 [US2] Implement queue time trend analysis from pipeline run history
+- [x] T036 [US2] Implement agent pool utilization metrics and self-hosted ROI calculation
+- [x] T037 [US2] Add recommendation generation for ADO optimization opportunities
 
 **Checkpoint**: User Story 2 should be fully functional - can analyze ADO org independently
 
